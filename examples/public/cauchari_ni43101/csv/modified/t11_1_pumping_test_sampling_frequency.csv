@@ -1,0 +1,9 @@
+tabla,pag_impresa,pag_pdf,time_interval,sampling_frequency,nota
+11.1,179,195,0-5 minutes,Every 30 seconds,
+11.1,179,195,5-10 minutes,Every minute,
+11.1,179,195,10-30 minutes,Every 2 minutes,
+11.1,179,195,30-60 minutes,Every 5 minutes,
+11.1,179,195,1 – 2 hours,Every 10 minutes,
+11.1,179,195,2 – 3 hours,Every 20 minutes,
+11.1,179,195,3 – 4 hours,Every 30 minutes,
+11.1,179,195,4 hours – end,Hourly,

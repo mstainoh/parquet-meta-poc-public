@@ -1,0 +1,53 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 14
+observed_by: claude
+findings:
+- columns:
+  - well_id
+  - from_m
+  - to_m
+  severity: data_error
+  note: >-
+    DDH-06 intervals 118-136 and 140-190 m go below DDH-06's total depth of 129 m in Table 10.4 (text p.151/PDF
+    167, checked on the page image). The twin DDH-06A is 338.5 m deep. These rows (and maybe 100-115) probably belong
+    to DDH-06A, or Table 10.4 swapped the depths of DDH-6/DDH-6A (it lists 6A before 6). Either way a join to t10_4
+    by well_id gives sample depths below the hole bottom. The rows were kept as printed.
+- columns:
+  - length_m
+  - from_m
+  - to_m
+  severity: note
+  note: >-
+    Text p.152/PDF 168: the brine came from observation wells built in selected DD holes (Schedule 80 2-inch PVC
+    with 1 mm slotted screen), sampled March-August 2010. Samples were "initially collected with a low-flow pump.
+    However, later samples were collected with a bailer". The method changes within the table and is not identified
+    per row. Unlike Table 10.3, nothing in the text explains why length_m differs from to_m - from_m. The 2 rows
+    with length_m > to_m - from_m (DDH-01 70-105, DDH-06 140-190) stay unexplained. Table 10.2 gives 127 DDH field
+    samples for these 14 intervals.
+- columns:
+  - b_mg_l
+  - k_mg_l
+  - li_mg_l
+  - mg_mg_l
+  - so4_mg_l
+  severity: note
+  note: >-
+    Labs and methods are the same as for Table 10.3 (section 11.6.1, text p.180/PDF 196): ASA (ICP for K, Li, Mg,
+    B; gravimetric SO4) or the uncertified internal Exar lab (AA for Li and K, titration for Mg). Which lab produced
+    which row is not stated. QA/QC is in Section 12 (not audited).
+- columns:
+  - well_id
+  severity: note
+  note: >-
+    Figure 10.2 'Borehole Locations and Associated Drilling Platforms' (p.157/PDF 173; raster map, labels read visually):
+    the label 'PLATFORM PB-04' lists PB04, PP-04A,B and DDH-12,A. PB-04 has XY (Table 10.8, Appendix 1) and Z (Appendix
+    1). Hypothesis only: DDH-12 (chemistry in this table) may share the PB-04 location. Not applied: DDH-12 has
+    no coordinates in `wells`.
+- columns:
+  - well_id
+  - mg_mg_l
+  severity: note
+  note: >-
+    DDH-12 interval 65-70 m prints Mg as '927' with no thousands separator, while the rest of the column uses a
+    point as thousands separator (e.g. 4.847). It was read as 927 mg/L by magnitude; it may be a truncated value.

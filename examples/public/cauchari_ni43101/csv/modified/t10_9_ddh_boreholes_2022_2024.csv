@@ -1,0 +1,9 @@
+tabla,pag_impresa,pag_pdf,borehole_id,piezometer_name,screen_diameter_inches,type,plataform,contractor,total_depth_m,screen_top_mbtw,screen_base_mbtw,x_raw,y_raw,easting,northing,nota
+10.9,169,185,DD19D-05,,"2""",DDH,DD19D-05,Conosur,415,41.07,410.97,3420723,7371919,3420723,7371919,
+10.9,169,185,DD19D-06,DD19D-06 BIS,"2""",DDH,DD19D-06,Conosur,88,12,84,3422112,7368852,3422112,7368852,el sufijo BIS aparece en piezometer_name; el otro campo no lo lleva
+10.9,169,185,DD19D-07,,"8"", 12""",Rotary,DD19D-07,Wichi Toledo,493.7,90,421,3420882,7367309,3420882,7367309,
+10.9,169,185,DD19D-08,,"8"", 12""",Rotary,DD19D-08,Wichi Toledo,624,96,608,3421788,7365110,3421788,7365110,
+10.9,169,185,DD19D-11,,"8"", 12""",Rotary,DD19D-11,Wichi Toledo,706.8,72.11,700.23,3422049,7360087,3422049,7360087,
+10.9,169,185,DD19D-13,,"8"", 12""",Rotary,DD19D-13,Wichi Toledo,465,70,537,3420167,7358999,3420167,7358999,screen_base_mbtw (537) mayor que total_depth_m (465) en origen
+10.9,169,185,DD19D-15,,"8"", 12""",Rotary,DD19D-15,Wichi Toledo,652.83,66,607,3419956,7356406,3419956,7356406,
+10.9,169,185,DD19D-26 BIS,DD19D-26,"8"", 12""",Rotary,DD19D-26,Wichi Toledo,533,80,524,3419508,7363138,3419508,7363138,el sufijo BIS aparece en borehole_id; el otro campo no lo lleva

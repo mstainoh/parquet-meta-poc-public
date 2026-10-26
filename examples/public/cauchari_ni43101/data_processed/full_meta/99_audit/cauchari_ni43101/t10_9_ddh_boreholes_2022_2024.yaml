@@ -1,0 +1,37 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t10_9_ddh_boreholes_2022_2024.yaml
+source_sha256: 4e4bfbce4e95c8244db4515dd7cfd16919a7b244a157a7af43480ed2e229562f
+git_commit: null
+written_at: '2026-10-26 12:00:18.262283'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - borehole_id\n    not_nulls:\n  \
+  \  - borehole_id\n    foreign_keys:\n    - source_col: borehole_id\n      target_table:\
+  \ wells\n      target_col: pozo_id\n  semantics:\n    description: >-\n      DD19D\
+  \ boreholes of the 2022-2024 program with piezometer screen and coordinates. Source:\
+  \ NI 43-101\n      technical report on the Cauchari-Olaroz operation (effective\
+  \ Jan 8 2025), Table 10.9 (printed p.169,\n      PDF p.185).\n    grain: one row\
+  \ per borehole\n    caveats: >-\n      The source uses a DECIMAL COMMA (41,07) and\
+  \ was normalized. IDs are DD19D-xx (not DDH19D). The BIS\n      marker sits in different\
+  \ columns: DD19D-06 has piezometer 'DD19D-06 BIS' and DD19D-26 BIS has piezometer\n\
+  \      'DD19D-26'. The program is in Cauchari Sur, outside the certified resource\
+  \ area; the rotary wells\n      were not sampled for chemistry (pumping tests ongoing\
+  \ at report date). DD19D-13 prints screen_base\n      (537) greater than total_depth\
+  \ (465): kept as printed. X/Y are in the right order here.\n    temporal_scope:\
+  \ campaign_window\n    cross_tables:\n    - wells\n    column_info:\n      tabla:\
+  \ report table number the row was extracted from\n      pag_impresa: printed page\
+  \ of the report where the row is\n      pag_pdf: PDF page of the row (printed page\
+  \ + 16)\n      nota: >-\n        free-text flag written at extraction (source typo,\
+  \ outlier, reconstructed row, cross-check result);\n        empty = nothing to flag\n\
+  \      borehole_id: drill hole id; joins `wells.pozo_id`\n      piezometer_name:\
+  \ piezometer name when different from the hole (empty otherwise)\n      screen_diameter_inches:\
+  \ >-\n        diameter text as printed; for the rotary wells '8\", 12\"' is the\
+  \ two casing sizes of the telescopic\n        design, not one screen diameter\n\
+  \      type: hole type as printed\n      plataform: platform text as printed (source\
+  \ spelling)\n      total_depth_m: total depth, m\n      screen_top_mbtw: top of\
+  \ screen, m below top of well\n      screen_base_mbtw: base of screen, m below top\
+  \ of well\n      x_raw: X as printed (easting)\n      y_raw: Y as printed (northing)\n\
+  \      easting: easting EPSG:22183\n      northing: northing EPSG:22183\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

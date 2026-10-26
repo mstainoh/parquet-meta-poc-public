@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.818068",
+  "row_count": 29,
+  "file_columns": [
+    "tabla",
+    "pag_impresa",
+    "pag_pdf",
+    "well_id",
+    "from_m",
+    "to_m",
+    "length_m",
+    "nota",
+    "well_id_raw"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "pag_impresa": "int64",
+    "pag_pdf": "int64",
+    "well_id": "str",
+    "from_m": "float64",
+    "to_m": "float64",
+    "length_m": "float64",
+    "nota": "str",
+    "well_id_raw": "str"
+  },
+  "null_count": {
+    "tabla": 0,
+    "pag_impresa": 0,
+    "pag_pdf": 0,
+    "well_id": 0,
+    "from_m": 27,
+    "to_m": 0,
+    "length_m": 0,
+    "nota": 25,
+    "well_id_raw": 0
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "pag_impresa": 1,
+    "pag_pdf": 1,
+    "well_id": 29,
+    "from_m": 2,
+    "to_m": 25,
+    "length_m": 25,
+    "nota": 4,
+    "well_id_raw": 29
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 151,
+      "max": 151
+    },
+    "pag_pdf": {
+      "min": 167,
+      "max": 167
+    },
+    "from_m": {
+      "min": 165.0,
+      "max": 371.0
+    },
+    "to_m": {
+      "min": 20.5,
+      "max": 449.5
+    },
+    "length_m": {
+      "min": 20.5,
+      "max": 362.5
+    }
+  },
+  "file_size_bytes": 14650,
+  "file_index_columns": [],
+  "file_uniques": [
+    "well_id",
+    "well_id_raw"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [
+    {
+      "source_col": "well_id",
+      "target_table": "wells",
+      "target_col": "pozo_id",
+      "orphans": []
+    }
+  ],
+  "fk_verified": true
+}

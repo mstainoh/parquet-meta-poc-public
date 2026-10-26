@@ -1,0 +1,28 @@
+keys:
+  uniques: se puede joinear por estas columnas sin fan-out
+  not_nulls: columnas garantizadas sin nulos
+  foreign_keys: 'joins de esta tabla: source_col joinea con target_col de target_table
+    (target_col vacio = se llama igual que source_col)'
+  index_columns: en DuckDB son columnas normales, sin tratamiento especial - la limitacion
+    de indice es solo al leer con pandas
+semantics:
+  description: que ES la tabla; primer filtro para elegirla o descartarla
+  grain: que representa UNA FILA; puede prohibir agregaciones que keys.uniques habilita
+  caveats: trampas que hacen que una query valida devuelva un numero mal
+  temporal_scope:
+    rule: define que preguntas temporales tienen sentido; con current_state no se
+      puede pedir "el valor vigente al <fecha>"
+    value_descriptions:
+      current_state: foto de ahora, no se puede pedir "el valor vigente al <fecha>"
+      full_history: completa desde el origen
+      campaign_window: no cubre la historia completa
+      rolling_window: el rango cambia en cada corrida
+      static: catalogo sin eje temporal
+      audit: log del pipeline, no es dato de negocio
+  use_instead: redirect duro - si esta seteado, no consultes esta tabla, consulta
+    la que nombra
+  cross_tables: tablas que se miran junto con esta para entenderla
+  column_info: unidad, convencion y regla de uso de las columnas que la tienen
+  ignore_columns: presentes en el schema pero no hay que seleccionarlas
+  required_filters: OBLIGATORIO - toda query sobre esta tabla tiene que incluir estos
+    filtros

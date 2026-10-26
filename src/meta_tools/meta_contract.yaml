@@ -1,0 +1,780 @@
+# =====================================================================
+# METADATA CONTRACT - executable spec
+# =====================================================================
+# Design rules (the 5 groups, life cycle, invariants, formats):
+# see docs/model/metadata_model.md. This file is ONLY the per-field spec -
+# what a validator and an authoring agent need to decide whether
+# a value is valid and where it goes. The long prose explaining the "why"
+# of the structure lives there, not here.
+#
+# Format of each field:
+#   type:        token from the closed `types` vocabulary below
+#   required:    true | expected | false
+#   default:     value if not declared (only if required != true).
+#                Documentary: the checker does not apply it
+#   values:      [...]              only if type is enum
+#   fields:      {...}              only if type is object or
+#                                   list[object] (spec of each item)
+#   example:     valid example, of the declared type (tests/test_contract.py
+#                tests it against `type:` in meta, inspect and mechanical,
+#                so the spec and the validator do not drift apart)
+#   agent_rule:  one line. If present, the field goes into the reading key
+#                of the SQL agent (build_reading_key, which reads keys,
+#                semantics and inspect). If absent, it does not. An agent_rule
+#                outside those groups breaks tests/test_contract.py.
+#   value_descriptions: {...}       optional, only with `agent_rule` and
+#                type: enum. One line per value of `values`, it is
+#                included in the agent's reading key next to the
+#                field's agent_rule (see meta_tools/build.py,
+#                build_reading_key).
+#
+# `required` has three states:
+#   true       missing or null -> validation ERROR.
+#   expected   missing or null -> DEBT. It is logged and the run goes on.
+#   false      null is a legitimate answer ("not applicable").
+#
+#   null  = not declared
+#   []    = declared, and the answer is "none"
+#
+# A field does NOT carry its classification as an attribute of its own:
+# its POSITION gives it (which group of `meta` it hangs from - `keys` /
+# `semantics` / `provenance` - or whether it is in `mechanical` /
+# `inspect`). A single place for that information.
+# =====================================================================
+
+
+contract_version: 2
+# Version of THIS contract, not of any table. It goes up when the
+# SHAPE of the `meta` block changes. `meta.schema_version` can carry this
+# reference in tables that choose to stamp a version of the envelope.
+
+
+# ---------------------------------------------------------------------
+# CLOSED TYPE VOCABULARY
+# ---------------------------------------------------------------------
+# The validator (`_type_ok`, check/schema.py) recognizes these tokens and
+# NOTHING ELSE. An unknown token must fail with an error, never
+# degrade to "anything": a type that is not understood is a field
+# that is not validated.
+
+types:
+  - str
+  - int
+  - bool
+  - date
+  - datetime
+  - "list[str]"
+  - list                  # untyped items - mechanical: fk_orphans[].orphans
+  - "dict[str,str]"
+  - "dict[str,int]"       # mechanical: null_count, n_distinct
+  - "dict[str,list]"
+  - "dict[str,dict]"      # mechanical: min_max ({col: {min, max}})
+  - "list[object]"
+  - enum                 # requires `values:`
+  - object                # requires `fields:`
+
+
+# ---------------------------------------------------------------------
+# CUT-OFF RULE to classify a new field (metadata_model.md §4.4)
+# ---------------------------------------------------------------------
+# "Is this still true if tomorrow twice as much data comes in?"
+#   NO  and the machine can compute it    -> mechanical
+#   NO  and the machine cannot compute it -> inspect
+#   YES                                   -> semantics
+# Version for KEYS vs SEMANTICS: if the scanner can test it by opening
+# the table (duplicated(), isnull(), lookup against a PK) -> keys. If
+# it needs the consumer to honour it when reading the table and there is no
+# way to verify it from the data -> semantics.
+
+
+# ---------------------------------------------------------------------
+# WHO WRITES EACH GROUP AND WHERE IT LIVES
+# ---------------------------------------------------------------------
+# A single place for this info instead of repeating it field by field.
+
+groups:
+
+  mechanical:
+    written_by: scanner            # never by hand
+    written_when: despues de grabar la tabla
+    stored_in: fragmento JSON      # per table (ParquetScanner.to_json)
+    hand_written: false
+    verified: n/a
+
+  keys:
+    written_by: author             # user, by hand in the yaml
+    written_when: al grabar la tabla, y se re-chequea despues
+    stored_in: parquet             # inside meta:
+    hand_written: true
+    verified: true                 # the scanner runs the check
+
+  semantics:
+    written_by: author
+    written_when: al grabar la tabla
+    stored_in: parquet             # inside meta:
+    hand_written: true
+    verified: false
+
+  provenance:
+    written_by: writer             # + repo, username, quality, notes: from the consumer
+    written_when: al grabar la tabla
+    stored_in: parquet             # inside meta:
+    hand_written: false
+    verified: n/a
+
+  inspect:
+    written_by: agent              # command /inspect-table <table>
+    written_when: despues de grabar la tabla
+    stored_in: sidecar             # inspect/<TABLE>.yaml
+    hand_written: false
+    verified: n/a
+
+
+# =====================================================================
+# `meta` BLOCK - the contract proper
+# =====================================================================
+# One `meta` = one output table, always. Where it sits inside the
+# YAML of each config type: see the section at the end of the file.
+# `keys`, `semantics` and `provenance` are nested here, each one as its
+# own object - the position is what classifies a field, not a separate
+# tag. Each key below is the SPEC of a field, not the field itself.
+
+meta:
+
+  schema_version:
+    type: int
+    required: false
+    default: null
+    example: 1
+    # If included, it versions the envelope that wraps
+    # keys+semantics+provenance. Not mandatory: consumers can
+    # omit it so as not to confuse it with the versions of the groups.
+    # The producer stamps it along with provenance (check_provenance); in
+    # the authoring YAML it is an error (check_authoring).
+
+
+  # ===================================================================
+  # KEYS - declared and verifiable (metadata_model.md §2)
+  # ===================================================================
+  # ALWAYS declared here, in `meta.keys` - never anywhere else in the
+  # YAML. A cleaning step of the ETL can READ this and APPLY it as
+  # commands (not_nulls drops rows, etc); it does not declare it again.
+
+  keys:
+    type: object
+    required: true
+    fields:
+
+      uniques:
+        type: list[str]
+        required: expected
+        default: null
+        example: [well_id, datetime]
+        agent_rule: se puede joinear por estas columnas sin fan-out
+        # The formalized grain: the set of columns that identifies
+        # a row. Verifiable with duplicated(subset=uniques).
+        #   null = not declared yet -> DEBT
+        #   []   = declared, and the table has no key
+        # If `semantics.grain` names columns and this is null, it is a
+        # pending item, not an assertion.
+
+      not_nulls:
+        type: list[str]
+        required: false
+        default: []
+        example: [well_id, datetime]
+        agent_rule: columnas garantizadas sin nulos
+        # In a cleaning step it is a COMMAND (drops rows). As an
+        # assertion on the final table it says "none left here".
+
+      foreign_keys:
+        type: list[object]
+        required: false
+        default: []
+        agent_rule: >
+          joins de esta tabla: source_col joinea con target_col de
+          target_table (target_col vacio = se llama igual que source_col)
+        # One relation per column (ADR-017). The scanner looks up
+        # `target_table` by name among the tables the consumer passes
+        # it (`pk_sources` of ParquetScanner.run): if it is not there, or
+        # it is repeated, the FK stays unverified (mechanical.fk_verified:
+        # null). A source_col that does not exist in the table, or a target_col
+        # that does not exist in the target, fails the verification
+        # (mechanical.fk_verified: false). A composite FK is declared as
+        # one relation per column: each column is verified, not the tuple.
+        fields:
+
+          source_col:
+            type: str
+            required: true
+            example: well_id
+            # Column of this table.
+
+          target_table:
+            type: str
+            required: true
+            example: TBL_WELLS
+            # Referenced table: file name, without extension.
+
+          target_col:
+            type: str
+            required: false
+            default: null
+            example: well_id
+            # Referenced column. null = same name as source_col.
+
+      index_columns:
+        type: list[str]
+        required: false
+        default: []
+        example: [id]
+        agent_rule: >
+          en DuckDB son columnas normales, sin tratamiento especial -
+          la limitacion de indice es solo al leer con pandas
+        # Columns that pandas puts in the INDEX when reading, not as a
+        # regular column (e.g. an edge table: id = "<from>_<to>"). [] =
+        # default RangeIndex. Verifiable: the scanner checks this
+        # against `file_index_columns` (mechanical). Using an index instead
+        # of a column is almost always a construction error, not
+        # a design decision - it is declared here to live with it.
+        # The agent_rule speaks of the real consumer (SQL agent on
+        # DuckDB): a SELECT on these columns does not fail there. The
+        # reset_index problem belongs to whoever writes them with pandas,
+        # not to the agent that reads them.
+
+  # ===================================================================
+  # SEMANTICS - declared, not verifiable
+  # ===================================================================
+  # The most valuable part of the contract: it is the only thing an agent cannot
+  # deduce by opening the file.
+
+  semantics:
+    type: object
+    required: true
+    fields:
+
+      description:
+        type: str
+        required: true
+        example: >
+          water level readings for each monitoring well, manual and logger
+        agent_rule: que ES la tabla; primer filtro para elegirla o descartarla
+        # What this table IS, in one or two sentences. Subject = the TABLE, not
+        # the process that generates it. If you need to note the process or its
+        # relation with sibling tables, that goes in provenance.notes.
+
+      grain:
+        type: str
+        required: true
+        example: >
+          one row per well and reading time - a history, not a current snapshot
+        agent_rule: >
+          que representa UNA FILA; puede prohibir agregaciones que
+          keys.uniques habilita
+        # Everything `keys.uniques` cannot express, in prose: whether it is
+        # a current snapshot or a history, whether the per-well breakdown is
+        # deliberate and you must group to get back to the header level,
+        # whether summing a column is valid but averaging it is not. If grain
+        # and uniques name different columns, one of the two is wrong
+        # - it is the first check to run on the catalog.
+
+      caveats:
+        type: str
+        required: false
+        default: null
+        example: >
+          level_m is depth to water below the top of casing, not
+          elevation; NULL in level_m means a dry well, not a missing reading
+        agent_rule: trampas que hacen que una query valida devuelva un numero mal
+        # Pitfalls, purpose and how to read it. Everything that makes a
+        # syntactically valid query return a wrong number:
+        # conventions that cannot be mixed, NULL that is not zero,
+        # gaps that are not missing data, filters already applied
+        # upstream.
+        #
+        # NO OBSERVED NUMBERS.
+        #   "the gaps are unstable operation, not missing data" -> YES
+        #   "3.4% of the timestamps drop"                -> NO (mechanical)
+
+      temporal_scope:
+        type: enum
+        required: true
+        values: [current_state, full_history, campaign_window, rolling_window, static, audit]
+        example: full_history
+        agent_rule: >
+          define que preguntas temporales tienen sentido; con
+          current_state no se puede pedir "el valor vigente al <fecha>"
+        value_descriptions:
+          current_state: foto de ahora, no se puede pedir "el valor vigente al <fecha>"
+          full_history: completa desde el origen
+          campaign_window: no cubre la historia completa
+          rolling_window: el rango cambia en cada corrida
+          static: catalogo sin eje temporal
+          audit: log del pipeline, no es dato de negocio
+        # Resolves the ambiguity of a table without a date column, or
+        # whose config does not say which time window it covers.
+        # `value_descriptions` is the extractable version (build_reading_key)
+        # of the same per-value meaning; if one is edited, edit the other.
+
+      use_instead:
+        type: str
+        required: false
+        default: null
+        example: VW_WATER_LEVELS_DAILY
+        agent_rule: >
+          redirect duro - si esta seteado, no consultes esta tabla,
+          consulta la que nombra
+        # Name of the table to query instead of this one.
+        # For intermediate tables that survive for compatibility or because
+        # they feed a unified view. Top priority for the
+        # agent: it overrides any other signal.
+
+      cross_tables:
+        type: list[str]
+        required: false
+        default: []
+        example: [TBL_WELLS, TBL_REF_SUBMERSIBLE_PUMPS]
+        agent_rule: tablas que se miran junto con esta para entenderla
+        # The twin it is unified with, the catalog the
+        # attributes come from, the enriched version. Different from
+        # `keys.foreign_keys` (join).
+
+      column_info:
+        type: dict[str,str]
+        required: false
+        default: {}
+        example:
+          level_m: >
+            depth to water below the top of casing, in meters (positive down)
+          stick_up_m: casing height above ground - subtract it from level_m to refer the level to ground
+          well_id: FK to TBL_WELLS
+          source: "'manual' / 'logger'"
+          level_str: raw text from the field sheet - see level_m for the parsed number
+        agent_rule: unidad, convencion y regla de uso de las columnas que la tienen
+        # PARTIAL ON PURPOSE: only the columns that need an
+        # explanation. It is NOT the list of columns - that is mechanical,
+        # it comes from the parquet schema. Never list them all.
+        #
+        # What goes here: unit, convention, reference to another table,
+        # usage rule, possible categorical values, relation with a
+        # sibling column (raw vs parsed, uncorrected vs corrected).
+        #
+        # What does NOT go here: how many nulls it has, the range, how
+        # many distinct, whether it is "fully populated". The scanner
+        # computes all of that.
+        # When in doubt: it does not go here, it goes as a finding in `inspect`.
+        #
+        # `# TODO:` entries are copied verbatim and the agent does NOT
+        # fill them in.
+        #
+        # Example of the cut, on impeller_count:
+        #   "the catalogue curve follows the MODEL and its TDH_m
+        #    already includes every stage, so do not rescale it by
+        #    this column"
+        #     -> semantics: it is invariant, it is a usage rule
+        #   "does not match the pump_model suffix in 5 of 25 wells"
+        #     -> inspect: it is an observation, it expires
+
+      ignore_columns:
+        type: list[str]
+        required: false
+        default: []
+        example: [surrogate_id, update_dttm]
+        agent_rule: presentes en el schema pero no hay que seleccionarlas
+        # Housekeeping (surrogate_id, update_dttm), duplicates (a
+        # column that repeats another), legacy that a downstream view already
+        # drops.
+        # Do NOT put `__index_level_0__` here, nor the rest of the pandas index
+        # artifact: that is `keys.index_columns`.
+
+      required_filters:
+        type: list[str]
+        required: false
+        default: []
+        example: ["record_status = 'FINAL'"]
+        agent_rule: >
+          OBLIGATORIO - toda query sobre esta tabla tiene que incluir
+          estos filtros
+        # Non-negotiable filters the consumer MUST apply, in SQL.
+        # Different from the filters the ETL ALREADY applied (those go in
+        # caveats). Not verifiable from the data (the table may
+        # contain, on purpose, rows that violate it) - that is why it lives in
+        # semantics and not in keys. In some pipelines they are derived from the
+        # ETL's transformation config. [] if none. Do NOT invent.
+
+  # ===================================================================
+  # PROVENANCE - origin
+  # ===================================================================
+  # THE WRITER STAMPS IT. If this shows up hand-written in a YAML, it is
+  # an error. No agent_rule in any of its fields: it does not go into the
+  # reading key. The group reaches the agent only through the index columns
+  # the ETL config picks (`output.index.params.columns`, ADR-014); the rest
+  # is audit.
+
+  provenance:
+    type: object
+    required: true
+    fields:
+
+      repo:
+        type: str
+        required: true
+        example: warehouse
+        # Free identifier, set by the consumer when invoking the writer.
+
+      source_path:
+        type: str
+        required: true
+        example: config/water_levels_master.yaml
+
+      source_sha256:
+        type: str
+        required: false
+        example: 3f9a00000000000000000000000000000000000000000000000000000000beef
+        # sha256 of the bytes of the source YAML. false: audit tables without
+        # a source YAML (ADR-015).
+
+      git_commit:
+        type: str
+        required: false
+        default: null
+        example: a1b2c3d
+        # HEAD of the producer's repo. false: get_yaml_provenance leaves it
+        # null (with a warning) if git cannot resolve it - git not installed,
+        # or the producer does not run inside a repo (ADR-015).
+
+      written_at:
+        type: datetime
+        required: true
+        example: 2026-09-03T14:22:10-03:00
+        # get_yaml_provenance stamps the local time, without a time zone.
+
+      writer_version:
+        type: int
+        required: true
+        example: 1
+        # Added by to_parquet (WRITER_VERSION, write/parquet.py), only if
+        # the block carries provenance: it versions the code that wrote the
+        # block, not the shape of the contract nor that of the mechanical group.
+
+      username:
+        type: str
+        required: false
+        default: null
+        example: pepito
+        # Passed by the consumer when invoking the writer, as is. false: the
+        # consumer may not know the user (e.g. an automatic
+        # run); get_yaml_provenance leaves it null if not passed
+        # (ADR-015).
+
+      source_yaml:
+        type: str
+        required: false
+        example: "# el YAML de origen completo, verbatim"
+        # The whole YAML embedded. Against a table of tens of MB the
+        # cost of a few KB of text is irrelevant, and the parquet becomes
+        # self-describing: if the repo is lost, the file says how
+        # it was built. It is a backup, not queried. false: audit tables
+        # without a source YAML (ADR-015).
+
+      notes:
+        type: str
+        required: false
+        default: null
+        example: "generado junto con TBL_A y TBL_B en la misma corrida"
+        # Free text, the consumer passes it to the writer
+        # (get_yaml_provenance(notes=...)) when the table comes from a process
+        # that produces several tables at once and the relation is worth
+        # noting.
+        # Unstructured, not verifiable, no agent_rule: it is audit,
+        # not lineage the agent can query. Null if not applicable.
+        # Different from source_yaml: that one is the config of THIS table
+        # alone; this is the relation with sibling tables that source_yaml
+        # does not necessarily mention. It resolves table-level lineage
+        # without adding a structured field - see docs/ADR/ADR.md, ADR-008.
+
+      quality:
+        type: enum
+        required: false
+        example: silver
+        values: [bronze, silver, gold]
+        # Passed by the consumer (get_yaml_provenance(quality=...)). It reaches
+        # the agent only if the ETL config picks it as an index column
+        # (output.index.params.columns, ADR-014).
+
+# =====================================================================
+# INSPECT - sidecar, written by an agent
+# =====================================================================
+#
+# IT DOES NOT GO IN the table's YAML. It lives in inspect/<TABLE>.yaml.
+# It is generated by an agent command (/inspect-table) that opens the
+# table and looks at it; check_inspect validates it.
+#
+# What goes here: findings that require UNDERSTANDING something, not just
+# counting. If the scanner can compute it, it does not go here (it goes to
+# mechanical).
+#
+# IT EXPIRES. That is why it carries a date and an anchor: if
+# observed_row_count does not match the current row_count, it must be
+# reviewed (no check compares them today).
+
+inspect:
+
+  schema_version:
+    type: int
+    required: true
+    example: 1
+    # Versioned separately from meta: the sidecar evolves on its own.
+
+  observed_at:
+    type: date
+    required: true
+    example: 2026-09-03
+
+  observed_row_count:
+    type: int
+    required: true
+    example: 25
+    # Validity anchor. If it does not match the current row_count, the finding
+    # is expired until someone reviews it.
+
+  observed_by:
+    type: str
+    required: true
+    example: claude
+
+  git_commit:
+    type: str
+    required: false
+    default: null
+    example: a1b2c3d
+    # Commit of the inspected parquet, if it can be retrieved. Second
+    # anchor, more precise than the row_count.
+
+  findings:
+    type: list[object]
+    required: false
+    default: []
+    # Each finding is a comment or an error about the declared
+    # metadata, and names the columns it affects. They all travel with the
+    # schedule, unfiltered (ADR-014): the agent decides which ones bear on the
+    # question. `fields` is the spec of each item: check_inspect validates
+    # each one (messages with an index, e.g. inspect.findings[0].severity).
+    fields:
+
+      columns:
+        type: list[str]
+        required: true
+        example: [level_m]
+        # The columns the finding affects (may be just one).
+
+      severity:
+        type: enum
+        required: true
+        values: [data_error, note]
+        example: data_error
+        # data_error -> error in the data against what is declared: it can
+        #               ruin a number
+        # note       -> comment, context of the table
+
+      note:
+        type: str
+        required: true
+        example: >
+          deeper than the pump setting on 5 of the 25 wells - e.g.
+          well W-999 reports 182 m with the pump set at 150 m. Source
+          errors to fix (wrong reference point), not a real drawdown.
+
+
+# =====================================================================
+# MECHANICAL - comes from opening the table, never by hand
+# =====================================================================
+#
+# IT DOES NOT GO IN ANY YAML NOR IN THE SOURCE PARQUET. It lives in a
+# separate JSON fragment, per table. The scanning script writes it (in
+# this repo), reading the already-built file - never by hand. If it is
+# duplicated somewhere, that copy is stale.
+#
+# `file_` prefix: everything that is a physical fact of the file (not a
+# declaration) carries it, so as not to clash with names of other groups nor
+# with commonly used attributes (`.columns` of a DataFrame, for example).
+#
+# `ParquetScanner.to_json` (mechanical.py, package root) writes it
+# as JSON (`json.dumps(..., default=str)`), never by hand. That is why
+# `scanned_at` (type: datetime) reaches the checker as an ISO string, not
+# as a datetime object - the validator accepts both forms for
+# date/datetime (see check/schema.py).
+
+mechanical:
+
+  # Group stamp (metadata_model.md §4.3):
+  schema_version:
+    type: int
+    required: true
+    example: 2
+    # Shape of THIS group, versioned separately from the contract
+    # (MECHANICAL_SCHEMA_VERSION in fields.py) - it is not the same number
+    # as meta.schema_version.
+
+  scanned_at:
+    type: datetime
+    required: true
+    example: 2026-09-03T14:22:10.453607
+    # Timestamp of this scanner run.
+
+  # From the schema and the data:
+  row_count:
+    type: int
+    required: true
+    example: 48230
+
+  file_columns:
+    type: list[str]
+    required: true
+    example: [well_id, datetime, level_m]
+    # Actual list, from the arrow schema.
+
+  dtypes:
+    type: dict[str,str]
+    required: true
+    example: {well_id: "str", datetime: "datetime64[us]", level_m: "float64"}
+    # pandas str(dtype): depends on the version (string: object or str;
+    # date: datetime64[ns] or [us]). The example is the output with pandas 3.
+
+  null_count:
+    type: dict[str,int]
+    required: true
+    example: {well_id: 0, datetime: 0, level_m: 12}
+    # Per column.
+
+  n_distinct:
+    type: dict[str,int]
+    required: true
+    example: {well_id: 25, datetime: 48210, level_m: 9312}
+
+  min_max:
+    type: dict[str,dict]
+    required: true
+    example:
+      datetime: {min: "2018-01-01T00:00:00", max: "2026-08-30T00:00:00"}
+      level_m: {min: 2.1, max: 182.0}
+    # Numeric (bool included) and datetime64; dates as ISO
+    # strings. The inner {min, max} has no closed type of its own: it depends
+    # on each column's dtype, it is not validated beyond "it is a dict".
+
+  file_size_bytes:
+    type: int
+    required: true
+    example: 4820213
+
+  file_index_columns:
+    type: list[str]
+    required: true
+    example: []
+    # From the b'pandas' key: physical columns that pandas restores as
+    # index. [] = default RangeIndex.
+
+  file_uniques:
+    type: list[str]
+    required: true
+    example: []
+    # Columns whose duplicated() is False on their own, regardless of whether
+    # they are declared in keys.uniques. It is the UNDECLARED counterpart:
+    # a signal for inspect or for the author ("this is unique and you did not
+    # declare it").
+
+  # Result of running the keys checks against the data. A single
+  # boolean per field, symmetric across the four - the per-column
+  # detail lives in file_columns / null_count / fk_orphans /
+  # file_index_columns, it is not duplicated here:
+  uniques_verified:
+    type: bool
+    required: true
+    example: true
+    # NOT a hard failure: it is flagged and the run goes on. There can be
+    # drift (e.g. uniques names a column the table no longer has ->
+    # false). uniques null or [] -> true (there is no assertion to violate).
+
+  not_nulls_verified:
+    type: bool
+    required: true
+    example: true
+    # false if ANY column declared in not_nulls has nulls or does not
+    # exist in the table. Nothing declared -> true.
+
+  fk_orphans:
+    type: list[object]
+    required: true
+    # One entry per FK of keys.foreign_keys that could be verified
+    # (target found, both columns present), whether or not it has
+    # orphans (ADR-017). [] = no FK verified. The ones that were not
+    # verified do not appear: target missing -> fk_verified: null;
+    # column missing -> false, and the detail is its absence in
+    # file_columns (or in the target's columns), as in
+    # uniques_verified.
+    fields:
+
+      source_col:
+        type: str
+        required: true
+        example: well_id
+
+      target_table:
+        type: str
+        required: true
+        example: TBL_WELLS
+
+      target_col:
+        type: str
+        required: true
+        example: well_id
+        # Always resolved: source_col if the FK does not declare it.
+
+      orphans:
+        type: list
+        required: true
+        example: []
+        # Values of source_col with no match in target_col, sorted and with
+        # their type. [] = none (the example, consistent with fk_verified:
+        # true). With orphans: [W-999] and fk_verified: false. There are no
+        # accepted orphans.
+
+  fk_verified:
+    type: bool
+    required: false
+    default: null
+    example: true
+    # true if no FKs are declared or all were verified without orphans.
+    # false if any fk_orphans entry has orphans, if an FK
+    # names a column that does not exist (in the table or in the target, drift
+    # as in uniques_verified), or if a declared FK is malformed.
+    # null if none of that happens but some FK stayed unverified
+    # (target missing or repeated in pk_sources) - unverified is not
+    # failed.
+
+  index_columns_verified:
+    type: bool
+    required: true
+    example: true
+    # Compares keys.index_columns against file_index_columns, as
+    # sets. Nothing declared = no index: a named index that
+    # was not declared gives false.
+
+# `declared_but_missing` (required:expected fields that are null) does NOT
+# live here: it does not come from opening the table, it comes from
+# comparing the config YAML against this contract. It is output of the
+# checker (metadata_model.md §6; check_metadata logs it as info), it is
+# not persisted in any artifact.
+#
+# The agent artifacts (index, schedules, stats, audit - ADR-014,
+# build.py) are a MATERIALIZED VIEW of the 5 groups. Nothing is
+# written by hand in them. They stop being artifacts that are maintained and
+# become an output.
+
+
+# =====================================================================
+# WHERE `meta` HANGS IN THE CONFIG YAML
+# =====================================================================
+# Each producer decides it (top-level, or one per table if the config
+# writes several outputs); `find_meta_blocks` finds it at any
+# depth. The content of `meta` is always the same.

@@ -1,0 +1,26 @@
+meta:
+  keys:
+    uniques:
+    - time_interval
+    not_nulls:
+    - time_interval
+    foreign_keys: []
+  semantics:
+    description: >-
+      Measurement frequency to follow during a pumping test by time interval. Source: NI 43-101 technical
+      report on the Cauchari-Olaroz operation (effective Jan 8 2025), Table 11.1 (printed p.179, PDF p.195).
+    grain: one row per time interval of the test
+    caveats: >-
+      Text table. Despite the header, the schedule applies to the MEASUREMENTS of dynamic water level,
+      flow and turbidity during a pumping test (and to recovery readings), not to brine samples.
+    temporal_scope: static
+    cross_tables: []
+    column_info:
+      tabla: report table number the row was extracted from
+      pag_impresa: printed page of the report where the row is
+      pag_pdf: PDF page of the row (printed page + 16)
+      nota: >-
+        free-text flag written at extraction (source typo, outlier, reconstructed row, cross-check result);
+        empty = nothing to flag
+      time_interval: time window since the start of the test, as printed
+      sampling_frequency: how often to measure in that window, as printed

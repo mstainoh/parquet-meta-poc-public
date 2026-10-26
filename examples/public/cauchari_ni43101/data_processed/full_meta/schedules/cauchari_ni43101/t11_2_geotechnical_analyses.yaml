@@ -1,0 +1,31 @@
+schema_version: null
+keys:
+  uniques:
+  - analysis
+  not_nulls:
+  - analysis
+  foreign_keys: []
+semantics:
+  description: 'Geotechnical property analyses run on the core and the procedure (standard)
+    used for each. Source: NI 43-101 technical report on the Cauchari-Olaroz operation
+    (effective Jan 8 2025), Table 11.2 (printed p.182, PDF p.198).'
+  grain: one row per analysis
+  caveats: Text table (method catalogue, no results).
+  temporal_scope: static
+  cross_tables: []
+  column_info:
+    tabla: report table number the row was extracted from
+    pag_impresa: printed page of the report where the row is
+    pag_pdf: PDF page of the row (printed page + 16)
+    nota: free-text flag written at extraction (source typo, outlier, reconstructed
+      row, cross-check result); empty = nothing to flag
+    analysis: property analysed
+    procedure: standard or procedure used
+inspect: null
+file_columns:
+- tabla
+- pag_impresa
+- pag_pdf
+- analysis
+- procedure
+- nota

@@ -1,0 +1,44 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t10_8_production_wells.yaml
+source_sha256: 9863caa7e2a1428edf4407e7b7dad15eefc807758401b8550c535d0c396b9f63
+git_commit: null
+written_at: '2026-10-26 12:00:18.242282'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - pumping_well\n    not_nulls:\n \
+  \   - pumping_well\n    foreign_keys:\n    - source_col: pumping_well\n      target_table:\
+  \ wells\n      target_col: pozo_id\n  semantics:\n    description: >-\n      Production\
+  \ wells: year, depth, coordinates, drilling method and casing/screen construction.\
+  \ Source:\n      NI 43-101 technical report on the Cauchari-Olaroz operation (effective\
+  \ Jan 8 2025), Table 10.8 (printed\n      p.162-167, PDF p.178-182).\n    grain:\
+  \ one row per production well\n    caveats: >-\n      X AND Y ARE SWAPPED in the\
+  \ source for all rows (column X holds the northing). easting/northing were\n   \
+  \   assigned by magnitude (x_raw/y_raw keep the printed values) - use easting/northing,\
+  \ never x_raw/y_raw.\n      W-16 easting was corrected from 3227420 to 3427420 following\
+  \ Appendix 2 Table 4 (same northing).\n      Several wells disagree with Appendix\
+  \ 1 or Appendix 2 coordinates: see `wells.xy_conflicto` and inspect.\n      Depth\
+  \ and coordinate errors found against other tables are in inspect, not corrected.\
+  \ Multi-line\n      cells (drilling_diameter_inches, casing and screen lengths)\
+  \ are raw text with ' | ' between lines,\n      not numbers; the bit diameters per\
+  \ interval are parsed in the intervals table. WR-10 spans a page\n      break (kept\
+  \ as one row).\n    temporal_scope: static\n    cross_tables:\n    - t10_8_production_well_intervals\n\
+  \    - tA2_4_production_well_model\n    - wells\n    column_info:\n      tabla:\
+  \ report table number the row was extracted from\n      pag_impresa: printed page\
+  \ of the report where the row is\n      pag_pdf: PDF page of the row (printed page\
+  \ + 16)\n      nota: >-\n        free-text flag written at extraction (source typo,\
+  \ outlier, reconstructed row, cross-check result);\n        empty = nothing to flag\n\
+  \      pumping_well: well id as printed; joins `wells.pozo_id`\n      year: year\
+  \ drilled\n      total_depth_m: total depth, m\n      x_raw: '''X'' column as printed\
+  \ - actually NORTHING'\n      y_raw: '''Y'' column as printed - actually EASTING'\n\
+  \      easting: easting in EPSG:22183 (from y_raw, W-16 corrected)\n      northing:\
+  \ northing in EPSG:22183 (from x_raw)\n      drilling_method: drilling method as\
+  \ printed\n      drilling_diameter_inches: raw multi-line text of bit diameters\
+  \ and ranges\n      total_length_casing_inserted_m: raw text of casing sizes and\
+  \ lengths\n      total_length_screen_casing_inserted_m: >-\n        raw text of\
+  \ screen sizes and lengths; each length is the sum of several screen sections alternating\n\
+  \        with solid casing\n      solid_casing: solid casing material\n      screen_casing:\
+  \ screen casing material\n      xy_swapped: true when x/y were swapped by this cleaning\
+  \ (all rows)\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

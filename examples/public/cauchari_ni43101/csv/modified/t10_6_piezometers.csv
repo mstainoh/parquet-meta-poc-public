@@ -1,0 +1,50 @@
+tabla,pag_impresa,pag_pdf,borehole_id,piezometer_id,status,dd_borehole_id,piezometer_name,screen_diameter_in,platform_raw,contractor,total_depth_m,screen_top_mbtw,screen_base_mbtw,x_coordinate_m,y_coordinate_m,nota
+10.6,154,170,DD17S-001,ML-001,,DD17S-001,ML-001,2,1,IDEAL,200,109.4,174.8,3424377,7378282,
+10.6,154,170,DD17S-001,SL-001,,DD17S-001,SL-001,1,1,IDEAL,50,23.8,47.73,3424377,7378282,
+10.6,154,170,DD17D-001,DL-001,,DD17D-001,DL-001,2.5,1,IDEAL,450,265.5,444,3424392,7378275,
+10.6,154,170,DD17D-002B,DL-002,,DD17D-002B,DL-002,2,4,IDEAL,450,343.36,444.24,3427266,7396185,
+10.6,154,170,DD17S-002,ML-002,,DD17S-002,ML-002,2,4,IDEAL,189.1,109.2,168.7,3427273,7396180,
+10.6,154,170,DD17S-002,SL-002,,DD17S-002,SL-002,1,4,IDEAL,50,23.8,47.73,3427273,7396180,
+10.6,154,170,DD17S-003,ML-003,,DD17S-003,ML-003,2,9,IDEAL,200,151.72,193.3,3430870,7404487,
+10.6,154,170,DD17D-003,DL-003,,DD17D-003,DL-003,2.5,9,IDEAL,650,292.6,636.1,3430861,7404476,
+10.6,154,170,RC17D-003,DL-003B,,RC17D-003,DL-003 B,2.5,9,Major,648,221.2,642,3430859,7404497,
+10.6,154,170,RC17S-004,ML-004,,RC17S-004,ML-004,2,2,Major,200,122.75,194,3422991,7379367,
+10.6,154,170,RC17S-004,SL-004,,RC17S-004,SL-004,1,2,Major,50,23.8,47.73,3422991,7379367,
+10.6,154,170,DD17D-004,DL-004,,DD17D-004,DL-004,2.5,2,IDEAL,650,427.68,617.57,3423010,7379367,
+10.6,154,170,RC17D-004B,DL-004B,,RC17D-004 B,DL-004 B,2.5,2,Major,550,196.92,547.3,3423006,7379355,
+10.6,154,170,RC17S-004B,SL-004B,,RC17S-004 B,SL-004B,2.5,2,IDEAL,50,14.3,50,3423001,7379362,screen_diameter raw has a space before the inch mark
+10.6,154,170,DD17D-005,DL-005,,DD17D-005,DL-005,2.5,7,IDEAL,604.55,309.25,576.77,3429086,7400627,
+10.6,154,170,RC17S-005,ML-005,,RC17S-005,ML-005,2,7,Major,192,115,186.4,3429092,7400696,
+10.6,154,170,RC17S-006,ML-006,,RC17S-006,ML-006,2,3 13 14,Major,200,122.7,194,3427230,7392980,
+10.6,154,170,RC17S-006,SL-006,,RC17S-006,SL-006,1,3 13 14,Major,50,23.8,47.73,3427230,7392980,
+10.6,154,170,DD17D-006B,DL-006,,DD17D-006B,DL-006,2.5,3 13 14,IDEAL,450,255.9,443.95,3427245,7393001,screen_diameter has no inch mark in source (assumed inches)
+10.6,154,170,RC17S-007,SL-007,,RC17S-007,SL-007,1,8 15,Major,50,23.8,47.73,3429894,7398465,
+10.6,154,170,RC17S-007,ML-007,,RC17S-007,ML-007,2,8 15,Major,200,110.1,175.5,3429894,7398465,
+10.6,154,170,DD17D-007,DL-007,,DD17D-007,DL-007,2.5,8 15,IDEAL,450,217.1,436.7,3429885,7398456,
+10.6,154,170,RC17S-008,ML-008,,RC17S-008,ML-008,2.5,6,Major,160,86.1,151.5,3431846,7398167,
+10.6,154,170,DD17D-008,DL-008,,DD17D-008,DL-08,2,6,Major,447,267.3,439.56,3431865,7398168,
+10.6,154,170,RC17S-009,SL-009,,RC17S-009,SL-009,2,11 12,Major,50,23.8,47.73,3432230,7407612,
+10.6,154,170,RC17S-009,ML-009,,RC17S-009,ML-009,2.5,11 12,Major,200,122.9,194,3432230,7407612,
+10.6,154,170,DD17D-009,DL-009,,DD17D-009,DL-09,2.5,11 12,Major,450,218,444.05,3432221,7407596,
+10.6,154,170,RC17S-010B,ML-010,,RC17S-010 B,ML-010,2.5,5,Major,200,115.97,187.1,3429367,7395232,
+10.6,154,170,RC17S-010B,SL-010,,RC17S-010 B,SL-010,2,5,Major,50,23.8,47.73,3429367,7395232,
+10.6,155,171,DD17D-010,DL-010,,DD17D-010,DL-10,2.5,5,Major,450,230.1,444.4,3429348,7395235,
+10.6,155,171,RC17S-011,ML-011,,RC17S-011,ML-011,2.5,16,Major,200,101,166,3433260,7411045,
+10.6,155,171,DD17D-011,DL-011,,DD17D-011,DL-011,2.5,16,IDEAL,450,235.8,444,3433255,7411065,
+10.6,155,171,RC17S-012,ML-012,,RC17S-012,ML-012,2.5,10,Major,200,128.94,194.39,3433213,7405310,
+10.6,155,171,DD17D-012,DL-012,,DD17D-012,DL-012,3,10,Major,451.65,204.34,436,3433225,7405308,
+10.6,155,171,RC17S-013,SL-013,,RC17S-13,SL-13,1,18,IDEAL,50,23.8,47.6,3426671,7379792,
+10.6,155,171,RC17S-013,ML-013,,RC17S-13,ML-013,2,18,IDEAL,200,122.7,194,3426671,7379792,
+10.6,155,171,DD17D-013,DL-013,,DD17D-013,DL-013,2.5,18,IDEAL,450,279.18,443,3426658,7379792,
+10.6,155,171,DD17D-014,DL-014,,DD17D-014,DL-014,2.5,17 20,IDEAL,431.35,238,425.03,3426361,7387640,
+10.6,155,171,RC17S-014,ML-014,,RC17S-014,ML-014,2.5,17 20,IDEAL,200,104.75,194.9,3426381,7387647,
+10.6,155,171,RC17S-014,SL-014,,RC17S-014,SL-014,1,17 20,IDEAL,26.7,2.9,26.7,3426361,7387640,
+10.6,155,171,DD18D-001,,cemented,DD18D-001,Cemented,2.5,CN-10,IDEAL,300,,,3430069,7403904,"screen_top_mbtw = ""Cemented"" in source (non-numeric, left empty); screen_base_mbtw = ""Cemented"" in source (non-numeric, left empty); piezometer_name column holds status ""Cemented"" in source (no piezometer)"
+10.6,155,171,DD18D-002,,cemented,DD18D-002,Cemented,2.5,CN-14,IDEAL,300,,,3431478,7406690,"screen_top_mbtw = ""Cemented"" in source (non-numeric, left empty); screen_base_mbtw = ""Cemented"" in source (non-numeric, left empty); piezometer_name column holds status ""Cemented"" in source (no piezometer)"
+10.6,155,171,DD18D-003,,abandoned,DD18D-003,Abandoned,2.5,CN-19,IDEAL,13,,,3428499,7398500,"screen_top_mbtw = ""Abandoned"" in source (non-numeric, left empty); screen_base_mbtw = ""Abandoned"" in source (non-numeric, left empty); piezometer_name column holds status ""Abandoned"" in source (no piezometer)"
+10.6,155,171,DD18D-004,,cemented,DD18D-004,Cemented,2.5,CN-02,IDEAL,300,,,3427303,7397557,"screen_top_mbtw = ""Cemented"" in source (non-numeric, left empty); screen_base_mbtw = ""Cemented"" in source (non-numeric, left empty); piezometer_name column holds status ""Cemented"" in source (no piezometer)"
+10.6,155,171,DD18D-005,,cemented,DD18D-005,Cemented,2.5,CS-28,IDEAL,300,,,3424500,7382499,"screen_top_mbtw = ""Cemented"" in source (non-numeric, left empty); screen_base_mbtw = ""Cemented"" in source (non-numeric, left empty); piezometer_name column holds status ""Cemented"" in source (no piezometer)"
+10.6,155,171,DD18D-006,,cemented,DD18D-006,Cemented,2.5,CS-31,IDEAL,300,,,3426650,7385299,"screen_top_mbtw = ""Cemented"" in source (non-numeric, left empty); screen_base_mbtw = ""Cemented"" in source (non-numeric, left empty); piezometer_name column holds status ""Cemented"" in source (no piezometer)"
+10.6,155,171,DD18D-007,,cemented,DD18D-007,Cemented,2.5,P-17,IDEAL,300,,,3424250,7385700,"screen_top_mbtw = ""Cemented"" in source (non-numeric, left empty); screen_base_mbtw = ""Cemented"" in source (non-numeric, left empty); piezometer_name column holds status ""Cemented"" in source (no piezometer)"
+10.6,155,171,DD19D-001,DD19D-001,,DD19D-001,DD19D-001,,1,Hidrotec,632,,,3424376,7378282,"screen_diameter ""-"" in source; screen_top_mbtw = ""-"" in source (non-numeric, left empty); screen_base_mbtw = ""-"" in source (non-numeric, left empty)"
+10.6,155,171,DD19D-PE09,DD19D-PE09,,DD19D-PE09,DD19D-PE09,2,PE-09,Hidrotec,358,42,352,3419473,7374367,"row split in two lines in source (piezometer name ""DD19D-"" + ""PE09""), rebuilt; diameter glyph verified on image as 2 inches"

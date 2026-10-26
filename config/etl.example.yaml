@@ -1,0 +1,130 @@
+# Template of the metadata ETL config read by scripts/run_metadata_etl.py.
+#
+# Copy it to config/etl.yaml (the script's default; any other file can be
+# passed with --config PATH) and adapt sources and folders, the same way
+# .env.example is copied to .env.
+#
+# The config holds no paths. Every `path:` node names an environment
+# variable (`env`) plus an optional `subfolder`, resolved as
+# <value of env>/<subfolder>; the values live in .env. The two variables
+# used here, TABLESPATH and METADATAPATH, are the ones .env.example defines.
+# Variable names are free, as long as .env and this file agree.
+#
+# Synthetic example: a mining project with a `wells` source (well and pump
+# reference tables) and a `production` source (readings per well).
+
+# ---------------------------------------------------------------------
+# input: where the parquet tables are
+# ---------------------------------------------------------------------
+# One entry per source:
+#   name    label of the source. It names the per-source subfolder of the
+#           mechanical / schedules / audit outputs and fills the `source`
+#           column of the run log.
+#   path    root folder of the source: {env, subfolder}.
+#   params  optional keyword arguments of meta_tools.find_tables:
+#             recurse   also search subfolders (default true)
+#             include   regex or null: keep only tables whose path,
+#                       relative to the source root, matches it
+#             exclude   regex or null: drop tables whose relative path
+#                       matches it
+# Every table found is read in full, locally (ParquetScanner), and is
+# expected to carry its stamped `meta` already (meta_tools.to_parquet).
+input:
+  - name: wells
+    path:
+      env: TABLESPATH
+      subfolder: wells
+    params:
+      recurse: true
+      include: null
+      exclude: null
+  - name: production
+    path:
+      env: TABLESPATH
+      subfolder: production
+    params:
+      recurse: false
+      exclude: _tmp       # skip scratch tables, e.g. TBL_LEVELS_tmp.parquet
+
+# ---------------------------------------------------------------------
+# check_tables: re-check the metadata stamped in each parquet footer
+# ---------------------------------------------------------------------
+# Keyword arguments of meta_tools.check_table. Reads only the footer, not
+# the rows. `keys` and `semantics` are one surface (check_authoring): either
+# flag runs it. `provenance` runs check_provenance. With on_error_raise
+# false a failure is logged and recorded in the run log instead of stopping
+# the run.
+check_tables:
+  provenance: true
+  keys: true
+  semantics: true
+  on_error_raise: false
+
+# ---------------------------------------------------------------------
+# mechanical: ParquetScanner (group 1) - required section
+# ---------------------------------------------------------------------
+mechanical:
+  # FK targets are not configured here: each table declares them in
+  # `keys.foreign_keys` (source_col, target_table, target_col), and the
+  # scanner finds each target_table by file stem among the tables of
+  # `input:` (a missing or repeated name leaves that FK unverified).
+  # Keyword arguments of ParquetScanner.run (except pk_sources, built from
+  # the tables of the run).
+  run_params:
+    verify_keys: true           # uniques / not_nulls / index_columns
+    verify_foreign_keys: true   # fk_orphans / fk_verified
+    check: true                 # result has the complete mechanical field set
+    on_error_raise: false
+
+# ---------------------------------------------------------------------
+# output: artifacts written by the run (ADR-014) - required section
+# ---------------------------------------------------------------------
+# Each artifact is optional: a missing one logs a warning and is skipped.
+# Nothing is written with --dry-run. Folders are created if needed.
+output:
+  # Full mechanical block, one JSON per table: <path>/<source>/<TABLE>.json
+  mechanical:
+    path:
+      env: METADATAPATH
+      subfolder: mechanical
+
+  # What the agent reads per table (keys + semantics + inspect +
+  # file_columns, build_schedule): <path>/<source>/<TABLE>.yaml
+  schedules:
+    path:
+      env: METADATAPATH
+      subfolder: schedules
+
+  # Full provenance, one YAML per table (build_audit). Never meant for the
+  # agent: <path>/<source>/<TABLE>.yaml
+  # Keep the folder named 99_audit: the viewer skips YAMLs under it.
+  audit:
+    path:
+      env: METADATAPATH
+      subfolder: 99_audit
+
+  # Flat catalog, one row per table, pipe-delimited: <path>/<name>.txt
+  index:
+    name: index
+    path:
+      env: METADATAPATH
+    params:
+      # Output column -> dotted path over the flattened dict of each table
+      # (schedule + mechanical + provenance). `table` (the file stem) is
+      # always added first.
+      columns:
+        repo: provenance.repo
+        quality: provenance.quality
+        description: semantics.description
+        grain: semantics.grain
+        temporal_scope: semantics.temporal_scope
+        use_instead: semantics.use_instead
+        scanned_at: mechanical.scanned_at
+        written_at: provenance.written_at
+
+  # Run log, one row per table with that run's check flags:
+  # <path>/<name>.parquet
+  log:
+    name: run_log
+    path:
+      env: METADATAPATH

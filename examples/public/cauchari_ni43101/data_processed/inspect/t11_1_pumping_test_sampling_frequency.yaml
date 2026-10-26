@@ -1,0 +1,20 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 8
+observed_by: claude
+findings:
+  - columns: [sampling_frequency, time_interval]
+    severity: note
+    note: >-
+      Despite the header "Frequency of Sampling", the text (p.179-180/PDF 195-196) applies this schedule
+      to the MEASUREMENTS of dynamic water level, flow (m3/h) and turbidity, during development and the
+      constant-rate test, and to the recovery readings (water-level tape) until 95% recovery. It does not
+      apply to brine samples. Brine in the constant-rate test is sampled at 10 min, 30 min, 60 min and 2 h,
+      then every 4 hours to the end. time_interval is elapsed time since the pumping (or recovery) began.
+  - columns: [time_interval]
+    severity: note
+    note: >-
+      Test sequence per text p.179-180: development for 3-7 days (until solids < 0.1 ml in an Imhoff cone),
+      then a short 2-4 h test for the maximum rate, then an 8-12 h step test at 25/50/75/100% of the maximum,
+      then a constant-rate test of at least 7 days. Nearby wells' drawdown and recovery are also measured.
+      This applies to the 2017-2019 pumping test program.

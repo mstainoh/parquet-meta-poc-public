@@ -1,0 +1,40 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 8
+observed_by: claude
+findings:
+  - columns: [borehole_id, type, total_depth_m]
+    severity: data_error
+    note: >-
+      Text p.168/PDF 184: "three HQ diameter diamond drill holes were advanced, to a maximum depth of 600
+      m". The table has only 2 rows of type DDH: DD19D-05 (415 m) and DD19D-06 (88 m). Neither comes near
+      600 m. One diamond hole of this program is missing from the table (no id in the text), so COUNT of
+      DDH here gives 2 instead of 3.
+  - columns: [total_depth_m, screen_base_mbtw, borehole_id]
+    severity: data_error
+    note: >-
+      Text p.168: "6 wells were drilled with the construction characteristics of production wells. These
+      wells reached a depth of 700 m, are cased in 12" for the first 250 m and then in 8" at the bottom."
+      The count of 6 Rotary rows matches, but their depths are 465-706.8 m and only DD19D-11 is about 700
+      m. For DD19D-13, screen_base 537 > total_depth 465 (already in nota). The text's ~700 m suggests the
+      printed total depth, not the screen base, is the wrong value (inference). Treat
+      MAX/AVG(total_depth_m) of the rotary wells with care.
+  - columns: [screen_diameter_inches, type]
+    severity: note
+    note: >-
+      For the Rotary rows, "8", 12"" is the two casing sizes of the telescopic design (12" to 250 m, 8"
+      below; text p.168), not one screen diameter. The screen tops (66-96 m) sit in the 12" section.
+      These wells carry DD19D-ids although they are pumping-test wells, not diamond holes.
+  - columns: [contractor, type]
+    severity: note
+    note: >-
+      Section 11.2 (text p.175/PDF 191): rotary drilling for pumping wells was by Hidrotec and Wichi
+      Toledo, and "samples were not taken during rotary drilling for chemical analysis". At the report date
+      pumping tests on these 6 wells were "currently being carried out" (p.168). So there is no chemistry
+      for them in any table. The DDH contractor Conosur is not mentioned in section 11.3, which names
+      only Major Drilling and Ideal Drilling for diamond drilling.
+  - columns: [screen_top_mbtw, screen_base_mbtw]
+    severity: note
+    note: >-
+      csv/raw/EXTRACTION_NOTES.md left "mbtw" uninterpreted for this table. Its definition is in the note of Table
+      10.6 (p.155/PDF 171): "mbtw = metres below top of well", measured from the top of casing, not ground.

@@ -1,0 +1,26 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: well_aliases.yaml
+source_sha256: 1bad6b24cd481324e62e08928b0a23889e634b4b2aeb11fa1017cabec64616e6
+git_commit: null
+written_at: '2026-10-26 12:00:18.390725'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - pozo_a\n    - pozo_b\n    not_nulls:\n\
+  \    - pozo_a\n    - pozo_b\n    foreign_keys:\n    - source_col: pozo_a\n     \
+  \ target_table: wells\n      target_col: pozo_id\n    - source_col: pozo_b\n   \
+  \   target_table: wells\n      target_col: pozo_id\n  semantics:\n    description:\
+  \ >-\n      Pairs of different hole ids whose coordinates coincide within 5 m (same\
+  \ site, possibly the same\n      hole or a re-use of the platform). DERIVED from\
+  \ the coordinates of the report tables.\n    grain: one row per pair of ids (pozo_a\
+  \ < pozo_b)\n    caveats: >-\n      Coordinate coincidence is a hint, NOT proof\
+  \ of identity: a twin hole next to another also matches.\n      The ids are not\
+  \ merged in `wells`. Pairs where both holes are from Table 10.6 (shallow/deep twins\n\
+  \      of one site) are excluded. W-7 and W-10 appear because the source repeats\
+  \ coordinates (suspected\n      copy error), not because they are the same well.\n\
+  \    temporal_scope: static\n    cross_tables:\n    - wells\n    column_info:\n\
+  \      pozo_a: first id (alphabetical)\n      pozo_b: second id\n      dist_m: distance\
+  \ between the coordinates, m\n      prog_a: program of pozo_a\n      prog_b: program\
+  \ of pozo_b\n      relacion: kind of link; always mismo_sitio_por_coordenada\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

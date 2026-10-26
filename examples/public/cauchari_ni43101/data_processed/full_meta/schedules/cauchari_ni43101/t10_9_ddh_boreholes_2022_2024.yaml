@@ -1,0 +1,63 @@
+schema_version: null
+keys:
+  uniques:
+  - borehole_id
+  not_nulls:
+  - borehole_id
+  foreign_keys:
+  - source_col: borehole_id
+    target_table: wells
+    target_col: pozo_id
+semantics:
+  description: 'DD19D boreholes of the 2022-2024 program with piezometer screen and
+    coordinates. Source: NI 43-101 technical report on the Cauchari-Olaroz operation
+    (effective Jan 8 2025), Table 10.9 (printed p.169, PDF p.185).'
+  grain: one row per borehole
+  caveats: 'The source uses a DECIMAL COMMA (41,07) and was normalized. IDs are DD19D-xx
+    (not DDH19D). The BIS marker sits in different columns: DD19D-06 has piezometer
+    ''DD19D-06 BIS'' and DD19D-26 BIS has piezometer ''DD19D-26''. The program is
+    in Cauchari Sur, outside the certified resource area; the rotary wells were not
+    sampled for chemistry (pumping tests ongoing at report date). DD19D-13 prints
+    screen_base (537) greater than total_depth (465): kept as printed. X/Y are in
+    the right order here.'
+  temporal_scope: campaign_window
+  cross_tables:
+  - wells
+  column_info:
+    tabla: report table number the row was extracted from
+    pag_impresa: printed page of the report where the row is
+    pag_pdf: PDF page of the row (printed page + 16)
+    nota: free-text flag written at extraction (source typo, outlier, reconstructed
+      row, cross-check result); empty = nothing to flag
+    borehole_id: drill hole id; joins `wells.pozo_id`
+    piezometer_name: piezometer name when different from the hole (empty otherwise)
+    screen_diameter_inches: diameter text as printed; for the rotary wells '8", 12"'
+      is the two casing sizes of the telescopic design, not one screen diameter
+    type: hole type as printed
+    plataform: platform text as printed (source spelling)
+    total_depth_m: total depth, m
+    screen_top_mbtw: top of screen, m below top of well
+    screen_base_mbtw: base of screen, m below top of well
+    x_raw: X as printed (easting)
+    y_raw: Y as printed (northing)
+    easting: easting EPSG:22183
+    northing: northing EPSG:22183
+inspect: null
+file_columns:
+- tabla
+- pag_impresa
+- pag_pdf
+- borehole_id
+- piezometer_name
+- screen_diameter_inches
+- type
+- plataform
+- contractor
+- total_depth_m
+- screen_top_mbtw
+- screen_base_mbtw
+- x_raw
+- y_raw
+- easting
+- northing
+- nota

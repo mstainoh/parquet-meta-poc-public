@@ -1,0 +1,43 @@
+schema_version: null
+keys:
+  uniques:
+  - pozo_a
+  - pozo_b
+  not_nulls:
+  - pozo_a
+  - pozo_b
+  foreign_keys:
+  - source_col: pozo_a
+    target_table: wells
+    target_col: pozo_id
+  - source_col: pozo_b
+    target_table: wells
+    target_col: pozo_id
+semantics:
+  description: Pairs of different hole ids whose coordinates coincide within 5 m (same
+    site, possibly the same hole or a re-use of the platform). DERIVED from the coordinates
+    of the report tables.
+  grain: one row per pair of ids (pozo_a < pozo_b)
+  caveats: 'Coordinate coincidence is a hint, NOT proof of identity: a twin hole next
+    to another also matches. The ids are not merged in `wells`. Pairs where both holes
+    are from Table 10.6 (shallow/deep twins of one site) are excluded. W-7 and W-10
+    appear because the source repeats coordinates (suspected copy error), not because
+    they are the same well.'
+  temporal_scope: static
+  cross_tables:
+  - wells
+  column_info:
+    pozo_a: first id (alphabetical)
+    pozo_b: second id
+    dist_m: distance between the coordinates, m
+    prog_a: program of pozo_a
+    prog_b: program of pozo_b
+    relacion: kind of link; always mismo_sitio_por_coordenada
+inspect: null
+file_columns:
+- pozo_a
+- pozo_b
+- dist_m
+- prog_a
+- prog_b
+- relacion

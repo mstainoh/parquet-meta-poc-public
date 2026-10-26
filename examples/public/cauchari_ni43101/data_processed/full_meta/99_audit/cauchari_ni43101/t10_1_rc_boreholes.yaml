@@ -1,0 +1,31 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t10_1_rc_boreholes.yaml
+source_sha256: df501e8129fdc30ccf166b16ac69ad665ef11287cda379a6465b58587bd43e36
+git_commit: null
+written_at: '2026-10-26 12:00:18.085532'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - well_id\n    not_nulls:\n    - well_id\n\
+  \    foreign_keys:\n    - source_col: well_id\n      target_table: wells\n     \
+  \ target_col: pozo_id\n  semantics:\n    description: >-\n      RC (reverse circulation)\
+  \ boreholes PE-01..PE-22 drilled in 2009-2010 with the interval and length\n   \
+  \   drilled. Source: NI 43-101 technical report on the Cauchari-Olaroz operation\
+  \ (effective Jan 8 2025),\n      Table 10.1 (printed p.147, PDF p.163).\n    grain:\
+  \ one row per RC borehole\n    caveats: >-\n      from_m is empty where the source\
+  \ prints '-' (it means the hole starts at surface, not 0 declared);\n      only\
+  \ deepened twin holes declare a start. The source prints two column pairs per row;\
+  \ they were\n      unfolded to one row per hole. Use to_m for hole depth and SUM(length_m)\
+  \ only for metres drilled.\n      The table has no coordinates: see `wells` / section\
+  \ 15.3 and Appendix 1 for XY.\n    temporal_scope: campaign_window\n    cross_tables:\n\
+  \    - t10_3_rc_brine_chemistry\n    - t10_2_rc_brine_sample_counts\n    - wells\n\
+  \    column_info:\n      tabla: report table number the row was extracted from\n\
+  \      pag_impresa: printed page of the report where the row is\n      pag_pdf:\
+  \ PDF page of the row (printed page + 16)\n      nota: >-\n        free-text flag\
+  \ written at extraction (source typo, outlier, reconstructed row, cross-check result);\n\
+  \        empty = nothing to flag\n      well_id: RC borehole id, PE-nn; joins `wells.pozo_id`\n\
+  \      from_m: start of the drilled interval in m; empty = '-' in source\n     \
+  \ to_m: end of the drilled interval in m\n      length_m: metres drilled as printed\
+  \ (equals to_m - from_m in every row)\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

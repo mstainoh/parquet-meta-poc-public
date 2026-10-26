@@ -1,0 +1,20 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 7
+observed_by: claude
+findings:
+  - columns: [description, brine_samples]
+    severity: note
+    note: >-
+      Text p.147/PDF 163: the 1,487 RC field samples come from 15 RC holes, but only 14 holes have
+      chemistry in Table 10.3 (PE-03 excluded, flowing artesian with freshwater, text p.148/PDF 164). The
+      count therefore includes samples with no row in t10_3_rc_brine_chemistry. Also, SUM(length_m) of
+      Table 10.3 is 1,643 m, more than the 1,487 samples, so the averaged intervals are not "one sample per
+      metre". Do not derive sample counts from interval lengths or the other way round.
+  - columns: [description, brine_samples]
+    severity: note
+    note: >-
+      The QC rows (260 field duplicates, 263 blanks, 253 standards; 2,390 incl. QC) cover only the
+      2009-2010 RC + DDH programs. Sections 10-11 give no sample or QC counts for the 2017-2019 piezometer
+      program (Table 10.7) or the pumping tests. Section 11.5 (text p.178/PDF 194) says brine QA/QC is
+      covered in Section 12, which was not audited here. Duplicates are about 16% of field samples.

@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:23.032627",
+  "row_count": 172,
+  "file_columns": [
+    "pozo_id",
+    "programa",
+    "easting",
+    "northing",
+    "lat",
+    "lon",
+    "crs",
+    "fuente_xy",
+    "fuentes_xy",
+    "dispersion_xy_m",
+    "z_collar",
+    "fuente_z",
+    "xy_conflicto"
+  ],
+  "dtypes": {
+    "pozo_id": "str",
+    "programa": "str",
+    "easting": "float64",
+    "northing": "float64",
+    "lat": "float64",
+    "lon": "float64",
+    "crs": "str",
+    "fuente_xy": "str",
+    "fuentes_xy": "str",
+    "dispersion_xy_m": "float64",
+    "z_collar": "float64",
+    "fuente_z": "str",
+    "xy_conflicto": "object"
+  },
+  "null_count": {
+    "pozo_id": 0,
+    "programa": 0,
+    "easting": 43,
+    "northing": 43,
+    "lat": 43,
+    "lon": 43,
+    "crs": 43,
+    "fuente_xy": 43,
+    "fuentes_xy": 43,
+    "dispersion_xy_m": 43,
+    "z_collar": 161,
+    "fuente_z": 161,
+    "xy_conflicto": 43
+  },
+  "n_distinct": {
+    "pozo_id": 172,
+    "programa": 9,
+    "easting": 119,
+    "northing": 117,
+    "lat": 119,
+    "lon": 122,
+    "crs": 1,
+    "fuente_xy": 7,
+    "fuentes_xy": 10,
+    "dispersion_xy_m": 17,
+    "z_collar": 11,
+    "fuente_z": 1,
+    "xy_conflicto": 2
+  },
+  "min_max": {
+    "easting": {
+      "min": 3418305.0,
+      "max": 3433260.0
+    },
+    "northing": {
+      "min": 7343262.0,
+      "max": 7411065.0
+    },
+    "lat": {
+      "min": -24.028729,
+      "max": -23.417275
+    },
+    "lon": {
+      "min": -66.803046,
+      "max": -66.652994
+    },
+    "dispersion_xy_m": {
+      "min": 0.0,
+      "max": 1292.6
+    },
+    "z_collar": {
+      "min": 3936.49,
+      "max": 3962.3
+    }
+  },
+  "file_size_bytes": 29665,
+  "file_index_columns": [],
+  "file_uniques": [
+    "pozo_id"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [],
+  "fk_verified": true
+}

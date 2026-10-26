@@ -1,0 +1,4 @@
+tabla,pag_pdf,texto_crudo_de_la_fila,motivo
+10.5,168,DDH-01 | 70-105 | 40 | 765 | 5.253 | 596 | 1.399 | 10.901 | 2.35,"length_m mayor que to-from; valor leido correcto en imagen, tal cual"
+10.5,168,DDH-06 | 140-190 | 51 | 719 | 6.698 | 732 | 1.579 | 20.853 | 2.16,"length_m mayor que to-from; valor leido correcto en imagen, tal cual"
+10.5,168,DDH-12 | 65-70 | 5 | 696 | 4.120 | 464 | 927 | 16.834 | 2.00,Mg sin separador de miles en origen (927); tomado como 927 por magnitud

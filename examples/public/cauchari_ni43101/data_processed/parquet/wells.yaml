@@ -1,0 +1,56 @@
+meta:
+  keys:
+    uniques:
+    - pozo_id
+    not_nulls:
+    - pozo_id
+    foreign_keys: []
+  semantics:
+    description: >-
+      Registry of every physical hole named in the extracted tables (RC, DDH, piezometer boreholes, production,
+      infill) with its best coordinates and collar elevation. DERIVED table: built by this cleaning from
+      sections 10, 15.3, 16.1 and Appendices 1-2 of the NI 43-101 report.
+    grain: >-
+      one row per hole id named in the extracted tables (pozo_id), including reserve-model wells of Appendix
+      2 and wells under construction; the piezometers of a hole are in `t10_6_piezometers`
+    caveats: >-
+      Many RC (PE) and DDH holes of 2009-2010 have NO coordinates anywhere in the report: easting/northing
+      are empty and must stay NULL (do not estimate). fuente_xy is the first source found in the priority
+      10.6, 10.8, 10.9, 15.3, A1.T1, A2.T4, 16.1; fuentes_xy lists all. dispersion_xy_m is the largest
+      distance between the sources; xy_conflicto = true when it is above 10 m (the report contradicts
+      itself: check before using). z_collar comes only from Appendix 1 (land surface); the other tables
+      have no collar elevation. Holes at the same place with different ids are listed in `well_aliases`,
+      they are NOT merged.
+    temporal_scope: static
+    cross_tables:
+    - well_aliases
+    - t10_6_piezometers
+    column_info:
+      pozo_id: canonical hole id used by every other table
+      programa: >-
+        report table that first names the hole: RC_2009_2010 (T10.1), DDH_2009_2010 (T10.4/10.5), DDH_2017_2019
+        (T10.6, includes DD18D and DD19D-001/PE09), DDH_ROTARY_2022_2024 (T10.9: DDH and rotary holes),
+        PRODUCCION_10_8 (T10.8), PRODUCCION_2024 (T16.1), APENDICE_1, MODELO_APENDICE_2 (only in the reserve
+        model table), SOLO_TABLA_15_3
+      easting: easting, EPSG:22183 (POSGAR 94 / Argentina 3); NULL = not in the report
+      northing: northing, EPSG:22183; NULL = not in the report
+      lat: >-
+        latitude, decimal degrees WGS 84 (EPSG:4326), 6 decimals. Not in the report: reprojected by this
+        cleaning from easting/northing with pyproj (PROJ), EPSG:22183 -> EPSG:4326, POSGAR 94 taken as
+        WGS 84 (sub-metre difference). Inherits every caveat of easting/northing (assumed CRS, xy_conflicto);
+        NULL where easting is NULL
+      lon: longitude, decimal degrees WGS 84 (EPSG:4326); same conversion and caveats as lat
+      crs: >-
+        assumed CRS of easting/northing: no extracted table declares it; Gauss-Kruger zone 3 follows from
+        the magnitude and Appendix 1 mentions POSGAR 94 (the report also uses UTM 19S / WGS 84 elsewhere)
+      fuente_xy: report table the coordinates were taken from
+      fuentes_xy: all report tables with coordinates for this hole, separated by |
+      dispersion_xy_m: largest distance in m between the coordinates of the different sources
+      xy_conflicto: >-
+        true when dispersion_xy_m > 10; false also when there is only one source (not cross-checked) -
+        see fuentes_xy
+      z_collar: >-
+        land surface elevation, masl, from Appendix 1 at the Appendix 1 position (GPS for wells built
+        2010-2011, DEM for later ones); NULL if unknown. When fuente_xy is not A1.T1 and xy_conflicto
+        is true, easting/northing and z_collar are not from the same point
+      fuente_z: source table of z_collar

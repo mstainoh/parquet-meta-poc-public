@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.959923",
+  "row_count": 3,
+  "file_columns": [
+    "tabla",
+    "pag_impresa",
+    "pag_pdf",
+    "pozo_id",
+    "borehole_id",
+    "type",
+    "platform",
+    "contractor",
+    "stage",
+    "location",
+    "x_raw",
+    "y_raw",
+    "easting_m",
+    "northing_m",
+    "nota"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "pag_impresa": "int64",
+    "pag_pdf": "int64",
+    "pozo_id": "str",
+    "borehole_id": "str",
+    "type": "str",
+    "platform": "str",
+    "contractor": "str",
+    "stage": "str",
+    "location": "str",
+    "x_raw": "str",
+    "y_raw": "str",
+    "easting_m": "float64",
+    "northing_m": "float64",
+    "nota": "str"
+  },
+  "null_count": {
+    "tabla": 0,
+    "pag_impresa": 0,
+    "pag_pdf": 0,
+    "pozo_id": 0,
+    "borehole_id": 0,
+    "type": 0,
+    "platform": 0,
+    "contractor": 0,
+    "stage": 0,
+    "location": 0,
+    "x_raw": 0,
+    "y_raw": 0,
+    "easting_m": 0,
+    "northing_m": 0,
+    "nota": 3
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "pag_impresa": 1,
+    "pag_pdf": 1,
+    "pozo_id": 3,
+    "borehole_id": 3,
+    "type": 1,
+    "platform": 3,
+    "contractor": 1,
+    "stage": 1,
+    "location": 1,
+    "x_raw": 3,
+    "y_raw": 3,
+    "easting_m": 3,
+    "northing_m": 3,
+    "nota": 0
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 283,
+      "max": 283
+    },
+    "pag_pdf": {
+      "min": 299,
+      "max": 299
+    },
+    "easting_m": {
+      "min": 3424736.0,
+      "max": 3425552.0
+    },
+    "northing_m": {
+      "min": 7391203.0,
+      "max": 7393300.0
+    }
+  },
+  "file_size_bytes": 16176,
+  "file_index_columns": [],
+  "file_uniques": [
+    "pozo_id",
+    "borehole_id",
+    "platform",
+    "x_raw",
+    "y_raw",
+    "easting_m",
+    "northing_m"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [
+    {
+      "source_col": "pozo_id",
+      "target_table": "wells",
+      "target_col": "pozo_id",
+      "orphans": []
+    }
+  ],
+  "fk_verified": true
+}

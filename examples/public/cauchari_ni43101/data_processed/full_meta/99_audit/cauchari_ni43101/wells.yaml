@@ -1,0 +1,53 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: wells.yaml
+source_sha256: 0f3bb5efcbe96069c43f195073565f649701722ed694da8a0e38c1cd92ce19b2
+git_commit: null
+written_at: '2026-10-26 12:00:18.411195'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - pozo_id\n    not_nulls:\n    - pozo_id\n\
+  \    foreign_keys: []\n  semantics:\n    description: >-\n      Registry of every\
+  \ physical hole named in the extracted tables (RC, DDH, piezometer boreholes, production,\n\
+  \      infill) with its best coordinates and collar elevation. DERIVED table: built\
+  \ by this cleaning from\n      sections 10, 15.3, 16.1 and Appendices 1-2 of the\
+  \ NI 43-101 report.\n    grain: >-\n      one row per hole id named in the extracted\
+  \ tables (pozo_id), including reserve-model wells of Appendix\n      2 and wells\
+  \ under construction; the piezometers of a hole are in `t10_6_piezometers`\n   \
+  \ caveats: >-\n      Many RC (PE) and DDH holes of 2009-2010 have NO coordinates\
+  \ anywhere in the report: easting/northing\n      are empty and must stay NULL (do\
+  \ not estimate). fuente_xy is the first source found in the priority\n      10.6,\
+  \ 10.8, 10.9, 15.3, A1.T1, A2.T4, 16.1; fuentes_xy lists all. dispersion_xy_m is\
+  \ the largest\n      distance between the sources; xy_conflicto = true when it is\
+  \ above 10 m (the report contradicts\n      itself: check before using). z_collar\
+  \ comes only from Appendix 1 (land surface); the other tables\n      have no collar\
+  \ elevation. Holes at the same place with different ids are listed in `well_aliases`,\n\
+  \      they are NOT merged.\n    temporal_scope: static\n    cross_tables:\n   \
+  \ - well_aliases\n    - t10_6_piezometers\n    column_info:\n      pozo_id: canonical\
+  \ hole id used by every other table\n      programa: >-\n        report table that\
+  \ first names the hole: RC_2009_2010 (T10.1), DDH_2009_2010 (T10.4/10.5), DDH_2017_2019\n\
+  \        (T10.6, includes DD18D and DD19D-001/PE09), DDH_ROTARY_2022_2024 (T10.9:\
+  \ DDH and rotary holes),\n        PRODUCCION_10_8 (T10.8), PRODUCCION_2024 (T16.1),\
+  \ APENDICE_1, MODELO_APENDICE_2 (only in the reserve\n        model table), SOLO_TABLA_15_3\n\
+  \      easting: easting, EPSG:22183 (POSGAR 94 / Argentina 3); NULL = not in the\
+  \ report\n      northing: northing, EPSG:22183; NULL = not in the report\n     \
+  \ lat: >-\n        latitude, decimal degrees WGS 84 (EPSG:4326), 6 decimals. Not\
+  \ in the report: reprojected by this\n        cleaning from easting/northing with\
+  \ pyproj (PROJ), EPSG:22183 -> EPSG:4326, POSGAR 94 taken as\n        WGS 84 (sub-metre\
+  \ difference). Inherits every caveat of easting/northing (assumed CRS, xy_conflicto);\n\
+  \        NULL where easting is NULL\n      lon: longitude, decimal degrees WGS 84\
+  \ (EPSG:4326); same conversion and caveats as lat\n      crs: >-\n        assumed\
+  \ CRS of easting/northing: no extracted table declares it; Gauss-Kruger zone 3 follows\
+  \ from\n        the magnitude and Appendix 1 mentions POSGAR 94 (the report also\
+  \ uses UTM 19S / WGS 84 elsewhere)\n      fuente_xy: report table the coordinates\
+  \ were taken from\n      fuentes_xy: all report tables with coordinates for this\
+  \ hole, separated by |\n      dispersion_xy_m: largest distance in m between the\
+  \ coordinates of the different sources\n      xy_conflicto: >-\n        true when\
+  \ dispersion_xy_m > 10; false also when there is only one source (not cross-checked)\
+  \ -\n        see fuentes_xy\n      z_collar: >-\n        land surface elevation,\
+  \ masl, from Appendix 1 at the Appendix 1 position (GPS for wells built\n      \
+  \  2010-2011, DEM for later ones); NULL if unknown. When fuente_xy is not A1.T1\
+  \ and xy_conflicto\n        is true, easting/northing and z_collar are not from\
+  \ the same point\n      fuente_z: source table of z_collar\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

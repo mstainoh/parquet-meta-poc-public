@@ -1,0 +1,25 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t11_1_pumping_test_sampling_frequency.yaml
+source_sha256: 9e7cbaf76fbefd33ce782794e2c24c4249d8eaa501cf17375ac6727a4169bb63
+git_commit: null
+written_at: '2026-10-26 12:00:18.276130'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - time_interval\n    not_nulls:\n\
+  \    - time_interval\n    foreign_keys: []\n  semantics:\n    description: >-\n\
+  \      Measurement frequency to follow during a pumping test by time interval. Source:\
+  \ NI 43-101 technical\n      report on the Cauchari-Olaroz operation (effective\
+  \ Jan 8 2025), Table 11.1 (printed p.179, PDF p.195).\n    grain: one row per time\
+  \ interval of the test\n    caveats: >-\n      Text table. Despite the header, the\
+  \ schedule applies to the MEASUREMENTS of dynamic water level,\n      flow and turbidity\
+  \ during a pumping test (and to recovery readings), not to brine samples.\n    temporal_scope:\
+  \ static\n    cross_tables: []\n    column_info:\n      tabla: report table number\
+  \ the row was extracted from\n      pag_impresa: printed page of the report where\
+  \ the row is\n      pag_pdf: PDF page of the row (printed page + 16)\n      nota:\
+  \ >-\n        free-text flag written at extraction (source typo, outlier, reconstructed\
+  \ row, cross-check result);\n        empty = nothing to flag\n      time_interval:\
+  \ time window since the start of the test, as printed\n      sampling_frequency:\
+  \ how often to measure in that window, as printed\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

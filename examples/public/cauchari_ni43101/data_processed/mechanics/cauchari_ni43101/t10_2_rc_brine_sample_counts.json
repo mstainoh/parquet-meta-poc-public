@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.789725",
+  "row_count": 7,
+  "file_columns": [
+    "tabla",
+    "pag_impresa",
+    "pag_pdf",
+    "description",
+    "brine_samples",
+    "nota"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "pag_impresa": "int64",
+    "pag_pdf": "int64",
+    "description": "str",
+    "brine_samples": "int64",
+    "nota": "str"
+  },
+  "null_count": {
+    "tabla": 0,
+    "pag_impresa": 0,
+    "pag_pdf": 0,
+    "description": 0,
+    "brine_samples": 0,
+    "nota": 7
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "pag_impresa": 1,
+    "pag_pdf": 1,
+    "description": 7,
+    "brine_samples": 7,
+    "nota": 0
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 148,
+      "max": 148
+    },
+    "pag_pdf": {
+      "min": 164,
+      "max": 164
+    },
+    "brine_samples": {
+      "min": 127,
+      "max": 2390
+    }
+  },
+  "file_size_bytes": 11241,
+  "file_index_columns": [],
+  "file_uniques": [
+    "description",
+    "brine_samples"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [],
+  "fk_verified": true
+}

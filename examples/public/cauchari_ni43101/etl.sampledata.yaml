@@ -1,0 +1,73 @@
+# Metadata ETL config for the cauchari_ni43101 sample dataset, read by
+# scripts/run_metadata_etl.py --config <this file>. Based on
+# config/etl.example.yaml (see it for the meaning of each block).
+#
+# Every `path:` resolves as <value of SAMPLEDATAPATH>/<subfolder>.
+# SAMPLEDATAPATH is the folder of this file; set it in the environment of
+# the command (a variable already in the environment wins over .env).
+# Outputs are written per source: <path>/cauchari_ni43101/<TABLE>.
+
+input:
+  - name: cauchari_ni43101
+    path:
+      env: SAMPLEDATAPATH
+      subfolder: data_processed/parquet
+    params:
+      recurse: false
+
+check_tables:
+  provenance: true
+  keys: true
+  semantics: true
+  on_error_raise: false
+
+mechanical:
+  run_params:
+    verify_keys: true           # uniques / not_nulls / index_columns
+    verify_foreign_keys: true   # fk_orphans / fk_verified
+    check: true                 # result has the complete mechanical field set
+    on_error_raise: false
+
+output:
+  # One JSON per table: <path>/<source>/<TABLE>.json
+  mechanical:
+    path:
+      env: SAMPLEDATAPATH
+      subfolder: data_processed/mechanics
+
+  # What the agent reads per table: <path>/<source>/<TABLE>.yaml
+  schedules:
+    path:
+      env: SAMPLEDATAPATH
+      subfolder: data_processed/full_meta/schedules
+
+  # Full provenance, never meant for the agent: <path>/<source>/<TABLE>.yaml
+  # Keep the folder named 99_audit: the viewer skips YAMLs under it.
+  audit:
+    path:
+      env: SAMPLEDATAPATH
+      subfolder: data_processed/full_meta/99_audit
+
+  # Flat catalog, one row per table, pipe-delimited: <path>/<name>.txt
+  index:
+    name: index
+    path:
+      env: SAMPLEDATAPATH
+      subfolder: data_processed/full_meta
+    params:
+      columns:
+        repo: provenance.repo
+        quality: provenance.quality
+        description: semantics.description
+        grain: semantics.grain
+        temporal_scope: semantics.temporal_scope
+        use_instead: semantics.use_instead
+        scanned_at: mechanical.scanned_at
+        written_at: provenance.written_at
+
+  # Run log, one row per table with that run's check flags: <path>/<name>.parquet
+  log:
+    name: run_log
+    path:
+      env: SAMPLEDATAPATH
+      subfolder: data_processed/full_meta

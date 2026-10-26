@@ -1,0 +1,69 @@
+schema_version: null
+keys:
+  uniques:
+  - well_id
+  not_nulls:
+  - well_id
+  foreign_keys:
+  - source_col: pozo_id
+    target_table: wells
+    target_col: pozo_id
+semantics:
+  description: 'Location and construction of exploration/production wells: coordinates,
+    land surface elevation, depth, screen and hydrostratigraphic unit. Source: NI
+    43-101 technical report on the Cauchari-Olaroz operation (effective Jan 8 2025),
+    Appendix 1 Table 1 (printed p.426-427, PDF p.442-443).'
+  grain: one row per well
+  caveats: 'land_surface_elev_masl is the only collar elevation (z_collar) available
+    in the extracted set. The report''s note: coordinates of wells built after 2011
+    come from the DEM; those built in 2010-2011 from differential GPS (POSGAR 94).
+    fuente_z_raw applies that note by year_constructed (the selection by year is ours;
+    the note speaks of coordinates). Id spelling differs from Appendix 2 (PB-3A/PB-03A,
+    PB4/PB-04, W04-A/W-04A): use pozo_id. ''PB-I'' keeps the letter I of the source.
+    CW-62 has elevation ''NA'' (empty). Multi-unit hsu_raw cells are not split. Depths
+    are m below land surface.'
+  temporal_scope: static
+  cross_tables:
+  - wells
+  - tA2_4_production_well_model
+  column_info:
+    tabla: report table number the row was extracted from
+    pag_impresa: printed page of the report where the row is
+    pag_pdf: PDF page of the row (printed page + 16)
+    nota: free-text flag written at extraction (source typo, outlier, reconstructed
+      row, cross-check result); empty = nothing to flag
+    well_id: id as printed
+    pozo_id: canonical id; joins `wells.pozo_id`
+    x_raw: X as printed (easting)
+    y_raw: Y as printed (northing)
+    easting_m: easting EPSG:22183
+    northing_m: northing EPSG:22183
+    land_surface_elev_masl: land surface (collar) elevation, masl; empty for NA
+    land_surface_elev_raw: elevation text as printed
+    year_constructed: year the well was built
+    total_depth_m: total depth, m below land surface
+    screen_top_m_bls: screen top, m below land surface
+    screen_bottom_m_bls: screen bottom, m below land surface
+    hsu_raw: hydrostratigraphic unit text as printed
+    fuente_z_raw: report note on how coordinates/elevation were obtained, chosen by
+      year_constructed
+inspect: null
+file_columns:
+- tabla
+- pag_impresa
+- pag_pdf
+- pozo_id
+- well_id
+- x_raw
+- y_raw
+- easting_m
+- northing_m
+- land_surface_elev_masl
+- land_surface_elev_raw
+- year_constructed
+- total_depth_m
+- screen_top_m_bls
+- screen_bottom_m_bls
+- hsu_raw
+- fuente_z_raw
+- nota

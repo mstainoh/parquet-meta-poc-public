@@ -1,0 +1,52 @@
+meta:
+  keys:
+    uniques:
+    - well_id
+    - from_m
+    - to_m
+    not_nulls:
+    - well_id
+    - from_m
+    - to_m
+    foreign_keys:
+    - source_col: well_id
+      target_table: t10_4_ddh_boreholes_2009_2010
+      target_col: well_id
+    - source_col: well_id
+      target_table: wells
+      target_col: pozo_id
+  semantics:
+    description: >-
+      Brine chemistry averaged over depth intervals for DDH-01, 04, 06, 08, 12 and 13 (B, K, Li, Mg, SO4,
+      Mg/Li). Source: NI 43-101 technical report on the Cauchari-Olaroz operation (effective Jan 8 2025),
+      Table 10.5 (printed p.152, PDF p.168).
+    grain: one row per DDH hole and depth interval - an interval average, not a point sample
+    caveats: >-
+      THIS table writes a point as THOUSANDS separator in K, Mg and SO4 (4.847 = 4847) while Mg/Li is
+      a true decimal (2.20); both were normalized to plain numbers (rule: d.ddd in K/Mg/SO4 -> thousands).
+      length_m differs from to_m - from_m in some rows exactly as printed and the report does not explain
+      it. The table has no K/Li or SO4/Li. Every row is already an average over an interval of very different
+      length: weight by interval length when averaging, and do not pool Tables 10.3, 10.5 and 10.7 without
+      considering campaign, sampling method and laboratory.
+    temporal_scope: campaign_window
+    cross_tables:
+    - t10_4_ddh_boreholes_2009_2010
+    - wells
+    column_info:
+      tabla: report table number the row was extracted from
+      pag_impresa: printed page of the report where the row is
+      pag_pdf: PDF page of the row (printed page + 16)
+      nota: >-
+        free-text flag written at extraction (source typo, outlier, reconstructed row, cross-check result);
+        empty = nothing to flag
+      well_id: DDH id as printed (already two digits); joins `wells.pozo_id`
+      from_m: interval top, m
+      to_m: interval bottom, m
+      length_m: interval length as printed
+      b_mg_l: boron, mg/L
+      k_mg_l: potassium, mg/L (source uses '.' as thousands)
+      li_mg_l: lithium, mg/L
+      mg_mg_l: magnesium, mg/L
+      so4_mg_l: sulfate, mg/L (source uses '.' as thousands)
+      mg_li_orig: Mg/Li as printed (decimal)
+      mg_li_recalc: Mg/Li computed from mg_mg_l / li_mg_l

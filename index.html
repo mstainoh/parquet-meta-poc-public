@@ -1,0 +1,2580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visor de datos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root {
+    --bg: #12161a;
+    --panel: #1a1f25;
+    --panel-2: #20262d;
+    --border: #2a323a;
+    --text: #e7eaee;
+    --text-muted: #8b96a3;
+    --brine: #3fa9a0;
+    --brine-bright: #56c7bd;
+    --sand: #c98a4b;
+    --error: #d9704f;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  header {
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  header .title-block { display: flex; align-items: baseline; gap: 12px; }
+
+  h1 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  h1 .accent { color: var(--brine-bright); }
+
+  header p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 12.5px;
+  }
+
+  main {
+    display: flex;
+    height: calc(100vh - 65px);
+  }
+
+  aside {
+    width: 240px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    padding: 18px;
+    overflow-y: auto;
+    background: var(--panel);
+  }
+
+  /* Divisores arrastrables: ancho de la barra lateral y alto del editor. */
+  .splitter-v {
+    flex: 0 0 7px;
+    cursor: col-resize;
+    background: transparent;
+    transition: background 0.12s ease;
+  }
+  .splitter-v:hover, .splitter-v.dragging { background: rgba(63, 169, 160, 0.28); }
+
+  .splitter-h {
+    flex-shrink: 0;
+    height: 9px;
+    cursor: row-resize;
+    border-radius: 3px;
+    transition: background 0.12s ease;
+  }
+  .splitter-h::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 2px;
+    margin: 3px auto 0;
+    border-radius: 2px;
+    background: var(--border);
+  }
+  .splitter-h:hover, .splitter-h.dragging { background: rgba(63, 169, 160, 0.16); }
+  .splitter-h:hover::after, .splitter-h.dragging::after { background: var(--brine); }
+
+  .picker-btn {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--brine);
+    background: transparent;
+    color: var(--brine-bright);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .picker-btn:hover { background: rgba(63, 169, 160, 0.12); }
+  .picker-btn:disabled { opacity: 0.5; cursor: wait; }
+
+  .picker-btn-secondary {
+    margin-top: 8px;
+    border-color: var(--border);
+    color: var(--text-muted);
+  }
+  .picker-btn-secondary:hover { background: var(--panel-2); }
+
+  input[type="file"] { display: none; }
+
+  .section-label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: 22px 0 10px;
+  }
+
+  /* Secciones plegables de la barra lateral. */
+  .section-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-toggle:hover { color: var(--text); }
+  .section-toggle .caret {
+    display: inline-block;
+    font-size: 9px;
+    transition: transform 0.15s ease;
+  }
+  .section-toggle.collapsed .caret { transform: rotate(-90deg); }
+  .section-toggle .count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    opacity: 0.75;
+  }
+
+  .collapsible { max-height: 280px; overflow-y: auto; }
+  .collapsible.collapsed { display: none; }
+
+  .table-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    border: 1px solid transparent;
+  }
+  .table-item:hover { background: var(--panel-2); border-color: var(--border); }
+
+  .swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: linear-gradient(135deg, var(--brine), var(--sand));
+    flex-shrink: 0;
+  }
+  .swatch.geo { background: linear-gradient(135deg, #7a5cd6, #56c7bd); border-radius: 50%; }
+
+  .table-item .name {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .table-item .rows {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .empty-hint {
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.6;
+    margin-top: 8px;
+  }
+
+  .file-progress {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin-top: 6px;
+  }
+  .file-progress.ok { color: var(--brine-bright); }
+  .file-progress.err { color: var(--error); }
+
+  .panel-select { width: 100%; max-width: none; margin-bottom: 10px; }
+
+  .ficha-out {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  section.workspace {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 28px;
+    overflow: hidden;
+  }
+
+  .editor-wrap {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  textarea#sql {
+    width: 100%;
+    min-height: 96px;
+    resize: vertical;
+    background: transparent;
+    color: var(--text);
+    border: none;
+    outline: none;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 14px;
+    line-height: 1.6;
+  }
+
+  .editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--panel-2);
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .run-btn {
+    padding: 7px 16px;
+    border-radius: 5px;
+    border: none;
+    background: var(--brine);
+    color: #0c1210;
+    font-weight: 700;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .run-btn:hover { background: var(--brine-bright); }
+  .run-btn:disabled { opacity: 0.5; cursor: wait; }
+
+  .hint-kbd {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  select.ctl {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px 8px;
+    font-size: 11.5px;
+    font-family: var(--font-body);
+    max-width: 220px;
+  }
+  select.ctl:disabled { opacity: 0.4; }
+
+  label.ctl-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  input.ctl {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px 8px;
+    font-size: 11.5px;
+    font-family: var(--font-body);
+  }
+
+  .log-toolbar .ctl-label { flex: 1; min-width: 200px; }
+  .log-toolbar input.ctl { flex: 1; }
+  .log-actions { display: flex; gap: 8px; }
+
+  .history-nav { display: flex; gap: 4px; }
+  .history-nav .export-btn { padding: 5px 10px; }
+
+  .status-line {
+    margin: 10px 0;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    min-height: 16px;
+  }
+  .status-line.error { color: var(--error); }
+  .status-line.ok { color: var(--brine-bright); }
+
+  .results-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .tabs { display: flex; gap: 4px; margin-right: 8px; }
+  .tab {
+    padding: 5px 14px;
+    border-radius: 5px 5px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    font-family: var(--font-body);
+    cursor: pointer;
+  }
+  .tab.active { background: var(--panel-2); color: var(--brine-bright); font-weight: 600; }
+  .tab:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .export-btn {
+    padding: 5px 12px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    font-size: 11.5px;
+    font-family: var(--font-body);
+    cursor: pointer;
+  }
+  .export-btn:hover { border-color: var(--sand); color: var(--sand); }
+  .export-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .map-controls {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: var(--panel-2);
+  }
+  .map-controls.visible { display: flex; }
+  .map-controls input[type="range"] { width: 120px; }
+  .time-mode-controls { display: contents; }
+  input.ctl[type="date"], input.ctl[type="number"] { width: 130px; }
+
+  .results-scroll {
+    flex: 1;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel);
+  }
+  .results-scroll.controls-mode { border-radius: 0 0 8px 8px; overflow: hidden; }
+
+  table.results {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+
+  table.results thead th {
+    position: sticky;
+    top: 0;
+    background: var(--panel-2);
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--brine-bright);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  table.results tbody td {
+    padding: 7px 12px;
+    border-bottom: 1px solid rgba(42, 50, 58, 0.6);
+    white-space: nowrap;
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    animation: fadein 0.2s ease;
+  }
+
+  table.results tbody tr:hover td { background: rgba(63, 169, 160, 0.06); }
+
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+  .placeholder {
+    color: var(--text-muted);
+    font-size: 12.5px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  #map { width: 100%; height: 100%; background: #0d1114; }
+  .chart-pane { width: 100%; height: 100%; padding: 16px; box-sizing: border-box; position: relative; }
+  .chart-legend { position: absolute; right: 24px; bottom: 24px; }
+  .leaflet-container { background: #0d1114; font-family: var(--font-body); }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .leaflet-popup-content {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    margin: 10px 12px;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  .leaflet-popup-content b { color: var(--brine-bright); }
+  .leaflet-popup-content .pk { color: var(--text-muted); }
+  .leaflet-control-attribution {
+    background: rgba(26, 31, 37, 0.85) !important;
+    color: var(--text-muted) !important;
+    font-size: 10px !important;
+  }
+  .leaflet-control-attribution a { color: var(--text-muted) !important; }
+
+  .legend {
+    background: rgba(26, 31, 37, 0.92);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 11px;
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.4;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .legend .legend-title {
+    font-family: var(--font-mono);
+    color: var(--brine-bright);
+    font-size: 10.5px;
+    margin-bottom: 6px;
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .legend .bar { height: 10px; border-radius: 2px; margin-bottom: 4px; width: 150px; }
+  .legend .ends {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+  .legend .cat { display: flex; align-items: center; gap: 6px; margin-top: 3px; font-family: var(--font-mono); font-size: 10.5px; }
+  .legend .cat i { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .legend .note { color: var(--text-muted); font-size: 10px; margin-top: 5px; }
+
+  .map-hint {
+    color: var(--text-muted);
+    font-size: 12.5px;
+    padding: 40px;
+    text-align: center;
+    line-height: 1.7;
+  }
+  .map-hint code {
+    font-family: var(--font-mono);
+    color: var(--sand);
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>Visor de datos</h1>
+  </div>
+  <p>Corre 100% en tu navegador — los archivos nunca salen de esta PC</p>
+</header>
+
+<main>
+  <aside>
+    <button class="picker-btn" id="pickFolderBtn">Elegir carpeta</button>
+    <input type="file" id="folderInput" webkitdirectory directory multiple>
+    <button class="picker-btn picker-btn-secondary" id="pickFilesBtn">Elegir archivos</button>
+    <input type="file" id="filesInput" multiple accept=".parquet,.geojson,.json,.png,.jpg,.jpeg">
+    <button class="picker-btn picker-btn-secondary" id="pickMetadataBtn">Cargar metadata</button>
+    <input type="file" id="metadataInput" webkitdirectory directory multiple>
+    <button class="picker-btn picker-btn-secondary" id="pickIndexBtn">Cargar índice</button>
+    <input type="file" id="indexInput" accept=".txt">
+    <input type="file" id="sqlInput" accept=".sql,.txt">
+    <div class="empty-hint" id="emptyHint">
+      Elegí la carpeta donde tenés guardados los archivos <b>.parquet</b> y
+      <b>.geojson</b> (se cargan automáticamente todos los que encuentre adentro,
+      subcarpetas incluidas), o elegí archivos sueltos si preferís.
+      <br><br>
+      <b>Cargar metadata</b> se puede usar para cargar la carpeta con metadata de
+      la tabla (<b>.yaml</b>).
+      <br><br>
+      <b>Cargar índice</b> carga el catálogo de tablas (<b>.txt</b> separado por
+      <b>|</b>) como la tabla <b>table_index</b>, consultable con SQL.
+    </div>
+    <div id="fileProgressWrap" style="display:none;">
+      <div class="section-label section-toggle" data-panel="fileProgress">
+        <span class="caret">&#9662;</span> Archivos <span class="count" id="fileProgressCount"></span>
+      </div>
+      <div class="collapsible" id="fileProgress"></div>
+    </div>
+
+    <div id="tableListWrap" style="display:none;">
+      <div class="section-label section-toggle" data-panel="tableList">
+        <span class="caret">&#9662;</span> Tablas cargadas <span class="count" id="tableListCount"></span>
+      </div>
+      <div class="collapsible" id="tableList"></div>
+    </div>
+
+    <div id="geoListWrap" style="display:none;">
+      <div class="section-label section-toggle" data-panel="geoList">
+        <span class="caret">&#9662;</span> Capas geo <span class="count" id="geoListCount"></span>
+      </div>
+      <div class="collapsible" id="geoList"></div>
+    </div>
+
+    <div id="fichaWrap" style="display:none;">
+      <div class="section-label section-toggle" data-panel="fichaPanel">
+        <span class="caret">&#9662;</span> Fichas de metadata <span class="count" id="fichaCount"></span>
+      </div>
+      <div class="collapsible" id="fichaPanel">
+        <select class="ctl panel-select" id="fichaSelect">
+          <option value="">— elegí una tabla —</option>
+        </select>
+        <div class="ficha-out" id="fichaOut"></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="splitter-v" id="splitAside" title="Arrastrá para ajustar el ancho — doble clic para reiniciar"></div>
+
+  <section class="workspace">
+    <div class="editor-wrap">
+      <textarea id="sql" placeholder="Elegí un archivo para empezar, o escribí tu consulta SQL acá…" spellcheck="false"></textarea>
+      <div class="editor-toolbar">
+        <label class="ctl-label">
+          Ejemplos
+          <select class="ctl" id="examplesSelect">
+            <option value="">— elegir —</option>
+          </select>
+        </label>
+        <div class="history-nav">
+          <button class="export-btn" id="prevQueryBtn" title="Consulta anterior" disabled>◀</button>
+          <button class="export-btn" id="nextQueryBtn" title="Consulta siguiente" disabled>▶</button>
+          <button class="export-btn" id="saveSqlBtn" title="Guardar SQL como archivo">Guardar .sql</button>
+          <button class="export-btn" id="loadSqlBtn" title="Cargar un archivo .sql en el editor (no lo ejecuta)">Cargar .sql</button>
+        </div>
+        <span class="hint-kbd">Ctrl/Cmd + Enter para correr</span>
+        <button class="run-btn" id="runBtn" disabled>Ejecutar</button>
+      </div>
+      <div class="editor-toolbar log-toolbar">
+        <label class="ctl-label">
+          Comentario
+          <input type="text" class="ctl" id="logComment" placeholder="opcional — qué preguntaste o para qué sirvió">
+        </label>
+        <div class="log-actions">
+          <button class="export-btn" id="logSaveBtn">Guardar</button>
+          <button class="export-btn" id="logExportBtn">Exportar historial</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="splitter-h" id="splitEditor" title="Arrastrá para ajustar el alto del editor — doble clic para reiniciar"></div>
+
+    <div class="status-line" id="statusLine"></div>
+
+    <div class="results-toolbar">
+      <div class="tabs">
+        <button class="tab active" id="tabTable">Tabla</button>
+        <button class="tab" id="tabMap" disabled>Mapa</button>
+        <button class="tab" id="tabChart" disabled>XPlot</button>
+        <button class="tab" id="tabBars" disabled>Barras</button>
+        <button class="tab" id="tabTime" disabled>Tiempo</button>
+      </div>
+      <button class="export-btn" id="exportCsv" disabled>Exportar CSV</button>
+      <button class="export-btn" id="exportXlsx" disabled>Exportar Excel</button>
+    </div>
+
+    <div class="map-controls" id="mapControls">
+      <label class="ctl-label">
+        Colorear por
+        <select class="ctl" id="colorColSelect"></select>
+      </label>
+      <label class="ctl-label">
+        Escala
+        <select class="ctl" id="paletteSelect">
+          <option value="blue_red">Azul → Rojo</option>
+          <option value="blue_white_red">Azul → Blanco → Rojo</option>
+          <option value="viridis">Viridis</option>
+          <option value="brine">Turquesa → Arena</option>
+          <option value="indigo_naranja">Índigo → Naranja</option>
+          <option value="indigo_naranja_violeta">Índigo → Naranja → Violeta</option>
+        </select>
+      </label>
+      <label class="ctl-label">
+        Min
+        <input type="number" class="ctl" id="colorMinInput" placeholder="auto" style="width:70px">
+      </label>
+      <label class="ctl-label">
+        Max
+        <input type="number" class="ctl" id="colorMaxInput" placeholder="auto" style="width:70px">
+      </label>
+      <label class="ctl-label" id="monthSliderWrap" style="display:none">
+        Mes
+        <input type="range" id="monthSlider" min="0" max="0" value="0" step="1">
+        <span id="monthSliderLabel">Todos</span>
+      </label>
+      <label class="ctl-label">
+        <input type="checkbox" id="sizeToggle"> escalar tamaño
+      </label>
+      <label class="ctl-label">
+        Fondo
+        <select class="ctl" id="basemapSelect">
+          <option value="s2" selected>Sentinel-2 2016 (salar)</option>
+          <option value="sat">Satélite (Esri)</option>
+          <option value="topo">Topográfico</option>
+          <option value="ign">IGN Argenmap</option>
+          <option value="none">Sin fondo (offline)</option>
+        </select>
+      </label>
+      <label class="ctl-label">
+        <input type="checkbox" id="contextToggle"> capas de contexto
+      </label>
+    </div>
+
+    <div class="map-controls" id="chartControls">
+      <label class="ctl-label">
+        Eje X
+        <select class="ctl" id="chartXSelect"></select>
+      </label>
+      <label class="ctl-label">
+        Eje Y
+        <select class="ctl" id="chartYSelect"></select>
+      </label>
+      <label class="ctl-label">
+        Colorear por
+        <select class="ctl" id="chartHueSelect"></select>
+      </label>
+      <label class="ctl-label" id="chartHueContinuousLabel" style="display:none;">
+        <input type="checkbox" id="chartHueContinuous"> escala continua
+      </label>
+    </div>
+
+    <div class="map-controls" id="barsControls">
+      <label class="ctl-label">
+        Eje X (categoría)
+        <select class="ctl" id="barsXSelect"></select>
+      </label>
+      <label class="ctl-label">
+        Eje Y
+        <select class="ctl" id="barsYSelect"></select>
+      </label>
+      <label class="ctl-label">
+        Colorear por
+        <select class="ctl" id="barsHueSelect"></select>
+      </label>
+      <label class="ctl-label">
+        <input type="checkbox" id="barsStacked"> apilado
+      </label>
+    </div>
+
+    <div class="map-controls" id="timeControls">
+      <label class="ctl-label">
+        Modo
+        <select class="ctl" id="timeModeSelect">
+          <option value="hue">Categorías</option>
+          <option value="compare">Comparar variables</option>
+        </select>
+      </label>
+      <label class="ctl-label">
+        Eje de tiempo
+        <select class="ctl" id="timeXSelect"></select>
+      </label>
+      <span class="time-mode-controls" id="timeHueControls">
+        <label class="ctl-label">
+          Valor
+          <select class="ctl" id="timeYSelect"></select>
+        </label>
+        <label class="ctl-label">
+          Colorear por
+          <select class="ctl" id="timeHueSelect"></select>
+        </label>
+      </span>
+      <span class="time-mode-controls" id="timeCompareControls" style="display:none;">
+        <label class="ctl-label">
+          Serie 1
+          <select class="ctl" id="timeSerie1Select"></select>
+        </label>
+        <label class="ctl-label">
+          Tipo
+          <select class="ctl" id="timeSerie1Type">
+            <option value="bar">Barra</option>
+            <option value="line">Línea</option>
+            <option value="point">Punto</option>
+          </select>
+        </label>
+        <label class="ctl-label">
+          Serie 2
+          <select class="ctl" id="timeSerie2Select"></select>
+        </label>
+        <label class="ctl-label">
+          Tipo
+          <select class="ctl" id="timeSerie2Type">
+            <option value="bar">Barra</option>
+            <option value="line">Línea</option>
+            <option value="point">Punto</option>
+          </select>
+        </label>
+      </span>
+      <label class="ctl-label">
+        Desde
+        <input class="ctl" id="timeMinInput" type="number" placeholder="auto">
+      </label>
+      <label class="ctl-label">
+        Hasta
+        <input class="ctl" id="timeMaxInput" type="number" placeholder="auto">
+      </label>
+    </div>
+
+    <div class="results-scroll" id="resultsScroll">
+      <div class="placeholder" id="placeholder">Los resultados de tu consulta van a aparecer acá.</div>
+      <table class="results" id="resultsTable" style="display:none;">
+        <thead><tr id="resultsHead"></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+      <div id="mapPane" style="display:none; height:100%;">
+        <div class="map-hint" id="mapHint" style="display:none;"></div>
+        <div id="map"></div>
+      </div>
+      <div class="chart-pane" id="chartPane" style="display:none;">
+        <canvas id="chartCanvas"></canvas>
+        <div class="legend chart-legend" id="chartLegend" style="display:none;"></div>
+      </div>
+      <div class="chart-pane" id="barsPane" style="display:none;">
+        <div class="map-hint" id="barsHint" style="display:none; padding:4px 0 8px;"></div>
+        <canvas id="barsCanvas"></canvas>
+      </div>
+      <div class="chart-pane" id="timePane" style="display:none;">
+        <canvas id="timeCanvas"></canvas>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- SheetJS y Leaflet en modo clásico (no ES module): funcionan igual abierto
+     con doble clic (file://) que servido por HTTP. -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<script type="module">
+  // duckdb-wasm se importa como módulo ES desde un CDN remoto (https://), por eso
+  // funciona incluso abriendo este archivo con doble clic (file://): la restricción
+  // de módulos locales de Chrome aplica a imports relativos en disco, no a imports
+  // cross-origin hacia un CDN. No dividir este archivo en módulos locales propios.
+  // Versión fija (no un rango): una versión nueva no entra sin aviso (ADR-006).
+  import * as duckdb from 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.32.0/+esm';
+
+  const pickFolderBtn = document.getElementById('pickFolderBtn');
+  const folderInput = document.getElementById('folderInput');
+  const pickFilesBtn = document.getElementById('pickFilesBtn');
+  const filesInput = document.getElementById('filesInput');
+  const pickMetadataBtn = document.getElementById('pickMetadataBtn');
+  const metadataInput = document.getElementById('metadataInput');
+  const pickIndexBtn = document.getElementById('pickIndexBtn');
+  const indexInput = document.getElementById('indexInput');
+  const fichaWrap = document.getElementById('fichaWrap');
+  const fichaSelect = document.getElementById('fichaSelect');
+  const fichaOut = document.getElementById('fichaOut');
+  const emptyHint = document.getElementById('emptyHint');
+  const fileProgress = document.getElementById('fileProgress');
+  const tableListWrap = document.getElementById('tableListWrap');
+  const tableList = document.getElementById('tableList');
+  const geoListWrap = document.getElementById('geoListWrap');
+  const geoList = document.getElementById('geoList');
+  const fileProgressWrap = document.getElementById('fileProgressWrap');
+  const asideEl = document.querySelector('aside');
+  const editorToolbar = document.querySelector('.editor-toolbar');
+  const splitAside = document.getElementById('splitAside');
+  const splitEditor = document.getElementById('splitEditor');
+  const sqlBox = document.getElementById('sql');
+  const runBtn = document.getElementById('runBtn');
+  const examplesSelect = document.getElementById('examplesSelect');
+  const prevQueryBtn = document.getElementById('prevQueryBtn');
+  const nextQueryBtn = document.getElementById('nextQueryBtn');
+  const logComment = document.getElementById('logComment');
+  const logSaveBtn = document.getElementById('logSaveBtn');
+  const logExportBtn = document.getElementById('logExportBtn');
+  const statusLine = document.getElementById('statusLine');
+  const placeholder = document.getElementById('placeholder');
+  const resultsScroll = document.getElementById('resultsScroll');
+  const resultsTable = document.getElementById('resultsTable');
+  const resultsHead = document.getElementById('resultsHead');
+  const resultsBody = document.getElementById('resultsBody');
+  const exportCsvBtn = document.getElementById('exportCsv');
+  const exportXlsxBtn = document.getElementById('exportXlsx');
+  const tabTable = document.getElementById('tabTable');
+  const tabMap = document.getElementById('tabMap');
+  const mapControls = document.getElementById('mapControls');
+  const mapPane = document.getElementById('mapPane');
+  const mapHint = document.getElementById('mapHint');
+  const colorColSelect = document.getElementById('colorColSelect');
+  const paletteSelect = document.getElementById('paletteSelect');
+  const colorMinInput = document.getElementById('colorMinInput');
+  const colorMaxInput = document.getElementById('colorMaxInput');
+  const monthSliderWrap = document.getElementById('monthSliderWrap');
+  const monthSlider = document.getElementById('monthSlider');
+  const monthSliderLabel = document.getElementById('monthSliderLabel');
+  const sizeToggle = document.getElementById('sizeToggle');
+  const basemapSelect = document.getElementById('basemapSelect');
+  const contextToggle = document.getElementById('contextToggle');
+  const tabChart = document.getElementById('tabChart');
+  const chartControls = document.getElementById('chartControls');
+  const chartPane = document.getElementById('chartPane');
+  const chartCanvas = document.getElementById('chartCanvas');
+  const chartXSelect = document.getElementById('chartXSelect');
+  const chartYSelect = document.getElementById('chartYSelect');
+  const chartHueSelect = document.getElementById('chartHueSelect');
+  const chartHueContinuousLabel = document.getElementById('chartHueContinuousLabel');
+  const chartHueContinuous = document.getElementById('chartHueContinuous');
+  const chartLegend = document.getElementById('chartLegend');
+  const tabBars = document.getElementById('tabBars');
+  const barsControls = document.getElementById('barsControls');
+  const barsPane = document.getElementById('barsPane');
+  const barsCanvas = document.getElementById('barsCanvas');
+  const barsHint = document.getElementById('barsHint');
+  const barsXSelect = document.getElementById('barsXSelect');
+  const barsYSelect = document.getElementById('barsYSelect');
+  const barsHueSelect = document.getElementById('barsHueSelect');
+  const barsStacked = document.getElementById('barsStacked');
+  const tabTime = document.getElementById('tabTime');
+  const timeControls = document.getElementById('timeControls');
+  const timePane = document.getElementById('timePane');
+  const timeCanvas = document.getElementById('timeCanvas');
+  const timeXSelect = document.getElementById('timeXSelect');
+  const timeYSelect = document.getElementById('timeYSelect');
+  const timeHueSelect = document.getElementById('timeHueSelect');
+  const timeModeSelect = document.getElementById('timeModeSelect');
+  const timeHueControls = document.getElementById('timeHueControls');
+  const timeCompareControls = document.getElementById('timeCompareControls');
+  const timeSerie1Select = document.getElementById('timeSerie1Select');
+  const timeSerie1Type = document.getElementById('timeSerie1Type');
+  const timeSerie2Select = document.getElementById('timeSerie2Select');
+  const timeSerie2Type = document.getElementById('timeSerie2Type');
+  const timeMinInput = document.getElementById('timeMinInput');
+  const timeMaxInput = document.getElementById('timeMaxInput');
+
+  const MAX_DISPLAY_ROWS = 500;
+  const MAX_MAP_FEATURES = 5000;
+
+  let db = null;
+  let conn = null;
+  let lastResultRows = null;   // filas completas del último query (para export/mapa)
+  let lastQuery = null;
+  let queryHistory = [];       // consultas efectivamente corridas, en orden (para Anterior/Siguiente)
+  let historyIndex = -1;
+
+  function setStatus(msg, kind) {
+    statusLine.textContent = msg || '';
+    statusLine.className = 'status-line' + (kind ? ' ' + kind : '');
+  }
+
+  async function initDuckDB() {
+    setStatus('Inicializando motor DuckDB (primera vez puede tardar unos segundos)…');
+    const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
+    const workerUrl = URL.createObjectURL(
+      new Blob([`importScripts("${bundle.mainWorker}");`], { type: 'text/javascript' })
+    );
+    const worker = new Worker(workerUrl);
+    const logger = new duckdb.ConsoleLogger(duckdb.LogLevel.WARNING);
+    db = new duckdb.AsyncDuckDB(logger, worker);
+    await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+    URL.revokeObjectURL(workerUrl);
+    conn = await db.connect();
+    setStatus('Listo. Elegí tus archivos .parquet / .geojson.');
+  }
+
+  function sanitizeTableName(filename) {
+    const base = filename.replace(/\.(parquet|geojson|json)$/i, '');
+    return base.replace(/[^a-zA-Z0-9_]/g, '_').replace(/^(\d)/, 't_$1');
+  }
+
+  // Un parquet y un geojson con el mismo nombre (o dos archivos del mismo nombre en
+  // subcarpetas distintas) sanean al mismo nombre de vista y se pisan a propósito: no se
+  // resuelve acá, el aviso es para que se note y se corrija en el origen. El archivo se
+  // identifica por su ruta relativa (con "Elegir carpeta"), así que volver a cargar el
+  // mismo archivo no avisa, y dos homónimos en subcarpetas distintas sí.
+  const tableSources = new Map(); // nombre saneado -> ruta del archivo que lo registró último
+  function noteTableSource(name, file, collisions) {
+    const source = file.webkitRelativePath || file.name;
+    const prev = tableSources.get(name);
+    if (prev && prev !== source && collisions && !collisions.includes(name)) {
+      collisions.push(name);
+    }
+    tableSources.set(name, source);
+  }
+
+  function sectionCount(id, n) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = n ? String(n) : '';
+  }
+
+  function addFileLog(text, kind) {
+    fileProgressWrap.style.display = 'block';
+    const line = document.createElement('div');
+    line.className = 'file-progress' + (kind ? ' ' + kind : '');
+    line.textContent = text;
+    fileProgress.appendChild(line);
+    sectionCount('fileProgressCount', fileProgress.children.length);
+    return line;
+  }
+
+  async function registerParquetFile(file, collisions) {
+    const line = addFileLog(`${file.name} — cargando…`);
+    try {
+      const buf = new Uint8Array(await file.arrayBuffer());
+      await db.registerFileBuffer(file.name, buf);
+      const tableName = sanitizeTableName(file.name);
+      noteTableSource(tableName, file, collisions);
+      await conn.query(
+        `CREATE OR REPLACE VIEW "${tableName}" AS SELECT * FROM parquet_scan('${file.name}')`
+      );
+      const countRes = await conn.query(`SELECT count(*) AS n FROM "${tableName}"`);
+      const n = Number(countRes.toArray()[0].toJSON().n);
+      line.textContent = `${file.name} — ✓ ${n.toLocaleString('es-AR')} filas`;
+      line.className = 'file-progress ok';
+      addTableToList(tableName, n);
+    } catch (err) {
+      line.textContent = `${file.name} — error: ${err.message}`;
+      line.className = 'file-progress err';
+      console.error(err);
+    }
+  }
+
+  // ── Capas geo ────────────────────────────────────────────────────────────
+  // El browser sólo indexa por id y pinta: nada de geoprocesamiento acá.
+
+  const geoLayers = new Map();   // nombre de capa -> { features: [], byId: Map }
+  const tableFichas = new Map(); // nombre de tabla (nombre del .yaml) -> texto crudo de su ficha
+
+  function featureId(f) {
+    const p = f.properties || {};
+    const raw = p.id ?? p.ID ?? p.Id ?? f.id;
+    return raw === undefined || raw === null ? null : String(raw);
+  }
+
+  async function registerGeoJsonFile(file, collisions) {
+    const line = addFileLog(`${file.name} — cargando…`);
+    try {
+      const text = await file.text();
+      const gj = JSON.parse(text);
+      if (!gj || gj.type !== 'FeatureCollection' || !Array.isArray(gj.features)) {
+        // .json que no es GeoJSON: se ignora en silencio salvo aviso
+        line.textContent = `${file.name} — no es un FeatureCollection, se omite`;
+        line.className = 'file-progress';
+        return;
+      }
+      const layerName = sanitizeTableName(file.name);
+      noteTableSource(layerName, file, collisions);
+      const byId = new Map();
+      for (const f of gj.features) {
+        const id = featureId(f);
+        if (id !== null && !byId.has(id)) byId.set(id, f);
+      }
+      geoLayers.set(layerName, { features: gj.features, byId });
+
+      line.textContent = `${file.name} — ✓ ${gj.features.length.toLocaleString('es-AR')} features`;
+      line.className = 'file-progress ok';
+      addGeoToList(layerName, gj.features.length);
+
+      // Las propiedades también se exponen como vista SQL, así se puede filtrar y
+      // agregar sobre los atributos del grafo con el mismo editor. La geometría no
+      // entra a DuckDB: el join es por atributo (sin extensión spatial).
+      // Si el bundle wasm no trae el lector de JSON, la capa igual queda mapeable.
+      try {
+        const ndjson = gj.features
+          .map(f => JSON.stringify({ ...(f.properties || {}), __geom: f.geometry ? f.geometry.type : null }))
+          .join('\n');
+        const virtualName = layerName + '.ndjson';
+        await db.registerFileText(virtualName, ndjson);
+        await conn.query(
+          `CREATE OR REPLACE VIEW "${layerName}" AS SELECT * FROM read_json_auto('${virtualName}')`
+        );
+        addTableToList(layerName, gj.features.length, true);
+      } catch (sqlErr) {
+        addFileLog(`${file.name} — capa mapeable, pero sin vista SQL (${sqlErr.message})`, 'err');
+        console.warn(sqlErr);
+      }
+    } catch (err) {
+      line.textContent = `${file.name} — error: ${err.message}`;
+      line.className = 'file-progress err';
+      console.error(err);
+    }
+  }
+
+  function addTableToList(tableName, rowCount, isGeo) {
+    tableListWrap.style.display = 'block';
+    const item = document.createElement('div');
+    item.className = 'table-item';
+    const sw = document.createElement('span');
+    sw.className = 'swatch' + (isGeo ? ' geo' : '');
+    const nm = document.createElement('span');
+    nm.className = 'name';
+    nm.title = tableName;
+    nm.textContent = tableName;
+    const rw = document.createElement('span');
+    rw.className = 'rows';
+    rw.textContent = rowCount.toLocaleString('es-AR');
+    item.append(sw, nm, rw);
+    item.addEventListener('click', () => {
+      sqlBox.value = `SELECT * FROM "${tableName}" LIMIT 100;`;
+      runBtn.disabled = false;
+    });
+    tableList.appendChild(item);
+    sectionCount('tableListCount', tableList.children.length);
+  }
+
+  function addGeoToList(layerName, count) {
+    geoListWrap.style.display = 'block';
+    const item = document.createElement('div');
+    item.className = 'table-item';
+    const sw = document.createElement('span');
+    sw.className = 'swatch geo';
+    const nm = document.createElement('span');
+    nm.className = 'name';
+    nm.title = layerName;
+    nm.textContent = layerName;
+    const rw = document.createElement('span');
+    rw.className = 'rows';
+    rw.textContent = count.toLocaleString('es-AR');
+    item.append(sw, nm, rw);
+    geoList.appendChild(item);
+    sectionCount('geoListCount', geoList.children.length);
+  }
+
+  // ── Paneles: divisores arrastrables y secciones plegables ────────────────
+  // Cosmético y sin estado persistido: al recargar vuelve a los valores base.
+
+  const ASIDE_MIN = 170, ASIDE_MAX = 620, ASIDE_DEFAULT = 240;
+  const EDITOR_MIN = 56, EDITOR_MAX = 520;
+
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+  function dragSplitter(handle, onMove, onEnd) {
+    handle.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      handle.setPointerCapture(e.pointerId);
+      handle.classList.add('dragging');
+      const move = (ev) => onMove(ev);
+      const up = (ev) => {
+        handle.classList.remove('dragging');
+        try { handle.releasePointerCapture(ev.pointerId); } catch {}
+        handle.removeEventListener('pointermove', move);
+        handle.removeEventListener('pointerup', up);
+        handle.removeEventListener('pointercancel', up);
+        if (onEnd) onEnd();
+      };
+      handle.addEventListener('pointermove', move);
+      handle.addEventListener('pointerup', up);
+      handle.addEventListener('pointercancel', up);
+    });
+  }
+
+  // El mapa de Leaflet no se entera solo de que cambió el tamaño del contenedor.
+  function afterResize() {
+    if (map && activeTab === 'map') map.invalidateSize();
+  }
+
+  function setEditorHeight(px) {
+    const h = px === null ? '' : clamp(px, EDITOR_MIN, EDITOR_MAX) + 'px';
+    sqlBox.style.height = h;
+    sqlBox.style.minHeight = h;
+  }
+
+  dragSplitter(splitAside, (e) => {
+    asideEl.style.width = clamp(e.clientX - asideEl.getBoundingClientRect().left,
+                                ASIDE_MIN, ASIDE_MAX) + 'px';
+  }, afterResize);
+  splitAside.addEventListener('dblclick', () => {
+    asideEl.style.width = ASIDE_DEFAULT + 'px';
+    afterResize();
+  });
+
+  dragSplitter(splitEditor, (e) => {
+    setEditorHeight(e.clientY - sqlBox.getBoundingClientRect().top - editorToolbar.offsetHeight);
+  }, afterResize);
+  splitEditor.addEventListener('dblclick', () => { setEditorHeight(null); afterResize(); });
+
+  for (const toggle of document.querySelectorAll('.section-toggle')) {
+    toggle.addEventListener('click', () => {
+      const panel = document.getElementById(toggle.dataset.panel);
+      const collapsed = toggle.classList.toggle('collapsed');
+      if (panel) panel.classList.toggle('collapsed', collapsed);
+    });
+  }
+
+  function collapseSection(panelId, collapsed) {
+    const toggle = document.querySelector(`.section-toggle[data-panel="${panelId}"]`);
+    const panel = document.getElementById(panelId);
+    if (!toggle || !panel) return;
+    toggle.classList.toggle('collapsed', collapsed);
+    panel.classList.toggle('collapsed', collapsed);
+  }
+
+  // isDate: la columna vino marcada como Date/Timestamp en el schema Arrow (ver
+  // isDateField). Hace falta como pista aparte porque duckdb-wasm no siempre empaqueta un
+  // TIMESTAMPTZ calculado (ej. date_trunc) como Date nativo — a veces llega como epoch en
+  // number o bigint, con el mismo tipo declarado que una columna cruda.
+  function sanitizeValue(v, isDate) {
+    if (v instanceof Date) return v.toISOString();
+    if (typeof v === 'bigint') {
+      if (isDate) return new Date(Number(v)).toISOString();
+      const n = Number(v);
+      return Number.isSafeInteger(n) ? n : v.toString();
+    }
+    if (isDate && typeof v === 'number') return new Date(v).toISOString();
+    if (v && typeof v === 'object' && typeof v.toArray === 'function') {
+      return JSON.stringify(v.toArray());
+    }
+    return v;
+  }
+
+  function isSelectOnlySql(sql) {
+    if ((sql.match(/;/g) || []).length > 1) return false;
+    return /^\s*(SELECT|WITH)\b/i.test(sql);
+  }
+
+  function updateHistoryNav() {
+    prevQueryBtn.disabled = historyIndex <= 0;
+    nextQueryBtn.disabled = historyIndex >= queryHistory.length - 1;
+  }
+
+  function pushToHistory(sql) {
+    if (queryHistory[queryHistory.length - 1] !== sql) queryHistory.push(sql);
+    historyIndex = queryHistory.length - 1;
+    updateHistoryNav();
+  }
+
+  function goToHistory(step) {
+    const i = historyIndex + step;
+    if (i < 0 || i >= queryHistory.length) return;
+    historyIndex = i;
+    sqlBox.value = queryHistory[historyIndex];
+    runBtn.disabled = false;
+    updateHistoryNav();
+  }
+
+  async function runQuery() {
+    const sql = sqlBox.value.trim();
+    if (!sql) return;
+    if (!isSelectOnlySql(sql)) {
+      setStatus('Solo se permite una consulta SELECT/WITH — revisá que no haya más de un ";" ni sentencias de escritura.', 'error');
+      return;
+    }
+    pushToHistory(sql);
+    runBtn.disabled = true;
+    setStatus('Ejecutando…');
+    const t0 = performance.now();
+    try {
+      const arrowResult = await conn.query(sql);
+      const rawRows = arrowResult.toArray().map(r => r.toJSON());
+      const dateCols = new Set();
+      for (const field of arrowResult.schema.fields) {
+        if (isDateField(field.type)) dateCols.add(field.name);
+      }
+      const rows = rawRows.map(row => {
+        const clean = {};
+        for (const k in row) clean[k] = sanitizeValue(row[k], dateCols.has(k));
+        return clean;
+      });
+      const ms = Math.round(performance.now() - t0);
+
+      lastResultRows = rows;
+      lastQuery = sql;
+      renderResults(rows);
+      setStatus(`${rows.length.toLocaleString('es-AR')} filas en ${ms} ms` +
+        (rows.length > MAX_DISPLAY_ROWS ? ` (mostrando las primeras ${MAX_DISPLAY_ROWS}, exportá para ver todo)` : ''), 'ok');
+      exportCsvBtn.disabled = false;
+      exportXlsxBtn.disabled = rows.length === 0;
+      prepareMap(rows, dateCols);
+      prepareChart(rows, dateCols);
+      prepareBars(rows);
+      prepareTime(rows, dateCols);
+    } catch (err) {
+      setStatus(err.message, 'error');
+      console.error(err);
+    } finally {
+      runBtn.disabled = false;
+    }
+  }
+
+  function renderResults(rows) {
+    resultsHead.innerHTML = '';
+    resultsBody.innerHTML = '';
+    if (rows.length === 0) {
+      placeholder.style.display = 'block';
+      placeholder.textContent = 'La consulta no devolvió filas.';
+      resultsTable.style.display = 'none';
+      return;
+    }
+    if (activeTab === 'table') {
+      placeholder.style.display = 'none';
+      resultsTable.style.display = 'table';
+    }
+
+    const cols = Object.keys(rows[0]);
+    for (const c of cols) {
+      const th = document.createElement('th');
+      th.textContent = c;
+      resultsHead.appendChild(th);
+    }
+    const shown = rows.slice(0, MAX_DISPLAY_ROWS);
+    for (const row of shown) {
+      const tr = document.createElement('tr');
+      for (const c of cols) {
+        const td = document.createElement('td');
+        const val = row[c];
+        td.textContent = val === null || val === undefined ? '' : String(val);
+        tr.appendChild(td);
+      }
+      resultsBody.appendChild(tr);
+    }
+  }
+
+  // ── Mapa ─────────────────────────────────────────────────────────────────
+
+  const PALETTES = {
+    blue_red:       ['#2c5fa8', '#5b9bd5', '#b9c6cf', '#e08b62', '#c1372c'],
+    blue_white_red: ['#2166ac', '#92c5de', '#f7f7f7', '#f4a582', '#b2182b'],
+    viridis:        ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'],
+    brine:          ['#1c4b47', '#3fa9a0', '#8fc7a5', '#c98a4b', '#e8c07a'],
+    indigo_naranja:         ['#515793', '#FA6414'],
+    indigo_naranja_violeta: ['#515793', '#FA6414', '#6D1ADC']
+  };
+
+  const CATEGORICAL = [
+    '#56c7bd', '#c98a4b', '#7a9cd6', '#d9704f', '#9b8fd6',
+    '#8fc7a5', '#d6b45c', '#c47ba8', '#6fa8b8', '#a8926f'
+  ];
+
+  const LAT_NAMES = ['lat', 'latitude', 'latitud', 'y_lat', 'lat_wgs84'];
+  const LON_NAMES = ['lon', 'lng', 'long', 'longitude', 'longitud', 'x_lon', 'lon_wgs84'];
+
+  let map = null;
+  let dataLayer = null;
+  let contextLayer = null;
+  let baseLayer = null;
+  let legendCtl = null;
+  let activeTab = 'table';
+  let mapState = null;   // { rows, mode, latCol, lonCol, idCol, numericCols, allCols }
+  let chartInstance = null;
+  let chartState = null;   // { rows, cols, numericCols }
+  let timeInstance = null;
+  let timeState = null;    // { rows, dateCols, numericCols }
+
+  function hexToRgb(h) {
+    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  }
+  function rgbToHex(r, g, b) {
+    const c = v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+    return '#' + c(r) + c(g) + c(b);
+  }
+  function rampColor(stops, t) {
+    if (!Number.isFinite(t)) return '#6b7680';
+    t = Math.max(0, Math.min(1, t));
+    const seg = (stops.length - 1) * t;
+    const i = Math.min(Math.floor(seg), stops.length - 2);
+    const f = seg - i;
+    const a = hexToRgb(stops[i]), b = hexToRgb(stops[i + 1]);
+    return rgbToHex(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f);
+  }
+  function cssGradient(stops) {
+    return `linear-gradient(to right, ${stops.join(', ')})`;
+  }
+  function fmtNum(v) {
+    if (!Number.isFinite(v)) return '—';
+    const abs = Math.abs(v);
+    const dec = abs >= 1000 ? 0 : abs >= 10 ? 1 : 3;
+    return v.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: dec });
+  }
+
+  function findCol(cols, candidates) {
+    const lower = cols.map(c => c.toLowerCase());
+    for (const cand of candidates) {
+      const i = lower.indexOf(cand);
+      if (i >= 0) return cols[i];
+    }
+    return null;
+  }
+
+  function isNumericCol(rows, col) {
+    let seen = 0;
+    for (const r of rows) {
+      const v = r[col];
+      if (v === null || v === undefined) continue;
+      if (typeof v !== 'number') return false;
+      if (++seen >= 20) break;
+    }
+    return seen > 0;
+  }
+
+  // Arrow Type ids del spec columnar (estables entre implementaciones): Date=8, Timestamp=10.
+  // Se usa el tipo declarado en el schema en vez de inspeccionar valores: duckdb-wasm no
+  // siempre empaqueta un TIMESTAMPTZ calculado (ej. date_trunc) como Date nativo en JS,
+  // aunque DuckDB reporte el mismo tipo SQL que una columna cruda (verificado con
+  // duckdb-python: date_trunc sobre TIMESTAMPTZ no cambia de tipo).
+  function isDateField(type) {
+    return !!type && (type.typeId === 8 || type.typeId === 10);
+  }
+
+  // Bucket a mes de una celda de fecha ya sanitizada (ISO string). null si no parsea.
+  function monthKey(v) {
+    if (typeof v !== 'string') return null;
+    const d = new Date(v);
+    if (!Number.isFinite(d.getTime())) return null;
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+  }
+  function monthLabel(key) {
+    const [y, m] = key.split('-').map(Number);
+    return new Date(Date.UTC(y, m - 1, 1))
+      .toLocaleDateString('es-AR', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+  }
+
+  // Detecta cómo geolocalizar el resultado: por columnas lat/lon, o por un id que
+  // matchee features de alguna capa GeoJSON cargada (join por atributo, §5 roadmap).
+  function detectGeometry(rows) {
+    if (!rows || !rows.length) return null;
+    const cols = Object.keys(rows[0]);
+
+    const latCol = findCol(cols, LAT_NAMES);
+    const lonCol = findCol(cols, LON_NAMES);
+    if (latCol && lonCol && isNumericCol(rows, latCol) && isNumericCol(rows, lonCol)) {
+      return { mode: 'points', latCol, lonCol, cols };
+    }
+
+    if (geoLayers.size) {
+      const sample = rows.slice(0, 200);
+      let best = null;
+      for (const col of cols) {
+        for (const [layerName, layer] of geoLayers) {
+          let hits = 0, tried = 0;
+          for (const r of sample) {
+            const v = r[col];
+            if (v === null || v === undefined) continue;
+            tried++;
+            if (layer.byId.has(String(v))) hits++;
+          }
+          if (tried && hits / tried >= 0.5) {
+            const score = hits / tried + (col.toLowerCase() === 'id' ? 1 : 0);
+            if (!best || score > best.score) best = { mode: 'join', idCol: col, layerName, score, cols };
+          }
+        }
+      }
+      if (best) return best;
+    }
+    return null;
+  }
+
+  function prepareMap(rows, dateCols) {
+    const geom = detectGeometry(rows);
+    if (!geom) {
+      mapState = null;
+      tabMap.disabled = true;
+      if (activeTab === 'map') switchTab('table');
+      monthSliderWrap.style.display = 'none';
+      return;
+    }
+    const cols = geom.cols;
+    const excluded = new Set([geom.latCol, geom.lonCol].filter(Boolean));
+    const candidates = cols.filter(c => !excluded.has(c));
+    const numericCols = candidates.filter(c => isNumericCol(rows, c));
+
+    // Slider de mes: opcional. Se ignora (queda null) si no hay columna de fecha o
+    // si trae un solo mes — filtrar no aportaría nada.
+    const dateCol = cols.find(c => dateCols.has(c)) || null;
+    const monthSet = new Set();
+    if (dateCol) for (const r of rows) {
+      const k = monthKey(r[dateCol]);
+      if (k) monthSet.add(k);
+    }
+    const months = [...monthSet].sort();
+    const hasMonthSlider = months.length >= 2;
+
+    mapState = {
+      ...geom, rows, numericCols, candidates,
+      dateCol: hasMonthSlider ? dateCol : null,
+      months: hasMonthSlider ? months : []
+    };
+
+    if (hasMonthSlider) {
+      monthSlider.max = String(months.length);
+      monthSlider.value = '0';
+      monthSliderLabel.textContent = 'Todos';
+      monthSliderWrap.style.display = '';
+    } else {
+      monthSliderWrap.style.display = 'none';
+    }
+
+    // Repoblar el selector de columna manteniendo la elección previa si sigue existiendo
+    const prev = colorColSelect.value;
+    colorColSelect.innerHTML = '';
+    for (const c of candidates) {
+      const o = document.createElement('option');
+      o.value = c;
+      o.textContent = c + (numericCols.includes(c) ? '' : '  (categórico)');
+      colorColSelect.appendChild(o);
+    }
+    colorColSelect.value = candidates.includes(prev) ? prev
+      : (numericCols[0] || candidates[0] || '');
+
+    tabMap.disabled = false;
+    if (activeTab === 'map') drawMap(true);
+  }
+
+  function ensureMap() {
+    if (map) return map;
+    // Vista neutra: drawMap(true) encuadra los datos con fitBounds al abrir el mapa.
+    map = L.map('map', { preferCanvas: true, zoomControl: true, attributionControl: true })
+           .setView([0, 0], 2);
+    setBasemap(basemapSelect.value);
+
+    legendCtl = L.control({ position: 'bottomright' });
+    legendCtl.onAdd = function () {
+      this._div = L.DomUtil.create('div', 'legend');
+      L.DomEvent.disableClickPropagation(this._div);
+      return this._div;
+    };
+    legendCtl.addTo(map);
+    return map;
+  }
+
+  // Todos gratuitos y sin API key. `maxNativeZoom` evita que la capa desaparezca
+  // al pasarse del zoom que el proveedor sirve: Leaflet reescala el último nivel.
+  const BASEMAPS = {
+    // Sentinel-2 cloudless 2016 (EOX) — CC BY 4.0: libre también para uso comercial,
+    // con atribución. Las capas de 2018 en adelante son CC BY-NC-SA (no comercial).
+    // Es el único fondo que sobre el salar muestra algo: 10 m/px, nativo hasta z14.
+    s2:    { url: 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/g/{z}/{y}/{x}.jpg',
+             attr: 'EOxCloudless <a href="https://cloudless.eox.at" target="_blank" rel="noopener">https://cloudless.eox.at</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016 &amp; 2017), <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>', maxNativeZoom: 14 },
+    // Esri World Imagery: anda sin clave, pero las condiciones de Esri piden una
+    // cuenta ArcGIS para uso comercial.
+    sat:   { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+             attr: 'Imagery &copy; Esri', maxNativeZoom: 19 },
+    // OpenTopoMap — CC-BY-SA, uso comercial permitido; atribución con el texto que piden.
+    topo:  { url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+             attr: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)', maxNativeZoom: 17 },
+    // Instituto Geográfico Nacional (Argentina). Servicio TMS: el eje Y va invertido.
+    ign:   { url: 'https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG:3857@png/{z}/{x}/{-y}.png',
+             attr: '&copy; Instituto Geográfico Nacional de la República Argentina', maxNativeZoom: 17 }
+  };
+
+  // Basemap offline: un `basemap_<nombre>.json` con {west, south, east, north,
+  // image_file} al lado de la imagen ya recortada y stitcheada. Se pinta con un
+  // ImageOverlay. Es el único fondo que no hace un solo pedido a internet:
+  // ningún tercero se entera de qué zona se está mirando.
+  const localBasemaps = new Map();   // nombre -> { url, bounds }
+
+  function setBasemap(kind) {
+    if (!map) return;
+    if (baseLayer) { map.removeLayer(baseLayer); baseLayer = null; }
+
+    if (kind.startsWith('local:')) {
+      const name = kind.slice(6);
+      const bm = localBasemaps.get(name);
+      if (!bm) return;
+      baseLayer = L.imageOverlay(bm.url, bm.bounds, {
+        opacity: 1, attribution: 'Imagen local: ' + name
+      }).addTo(map);
+      baseLayer.bringToBack();
+      return;
+    }
+
+    const cfg = BASEMAPS[kind];
+    if (!cfg) return;   // 'none': lienzo vacío, ni un pedido de tile sale de la PC
+    baseLayer = L.tileLayer(cfg.url, {
+      maxZoom: 19,
+      maxNativeZoom: cfg.maxNativeZoom,
+      attribution: cfg.attr
+    }).addTo(map);
+    baseLayer.bringToBack();
+  }
+
+  async function registerLocalBasemap(boundsFile, imagesByName) {
+    const line = addFileLog(`${boundsFile.name} — leyendo fondo…`);
+    try {
+      const b = JSON.parse(await boundsFile.text());
+      for (const k of ['west', 'south', 'east', 'north']) {
+        if (!Number.isFinite(b[k])) throw new Error(`falta "${k}" en el json de bounds`);
+      }
+      const name = b.name || boundsFile.name.replace(/^basemap_/, '').replace(/\.json$/i, '');
+      const imageFile = imagesByName.get(String(b.image_file || '').toLowerCase());
+      if (!imageFile) throw new Error(`no encontré la imagen "${b.image_file}" en la selección`);
+      localBasemaps.set(name, {
+        url: URL.createObjectURL(imageFile),
+        bounds: [[b.south, b.west], [b.north, b.east]]
+      });
+
+      const value = 'local:' + name;
+      if (!basemapSelect.querySelector(`option[value="${value}"]`)) {
+        const o = document.createElement('option');
+        o.value = value;
+        o.textContent = name + ' (offline)';
+        basemapSelect.insertBefore(o, basemapSelect.firstChild);
+      }
+      basemapSelect.value = value;   // si hay fondo local, es el mejor default
+      setBasemap(value);
+      line.textContent = `${imageFile.name} — ✓ fondo "${name}" (offline)`;
+      line.className = 'file-progress ok';
+    } catch (err) {
+      line.textContent = `${boundsFile.name} — ${err.message}`;
+      line.className = 'file-progress err';
+    }
+  }
+
+  // fixedMin/fixedMax: si son números finitos, reemplazan el min/max calculado de
+  // `values` — así la escala no se recalcula al filtrar por mes con el slider.
+  function buildColorFn(values, paletteKey, fixedMin, fixedMax) {
+    const stops = PALETTES[paletteKey] || PALETTES.blue_red;
+    const nums = values.filter(v => typeof v === 'number' && Number.isFinite(v));
+    const allNumeric = nums.length === values.filter(v => v !== null && v !== undefined).length
+                       && nums.length > 0;
+    if (allNumeric) {
+      const min = Number.isFinite(fixedMin) ? fixedMin : Math.min(...nums);
+      const max = Number.isFinite(fixedMax) ? fixedMax : Math.max(...nums);
+      const span = max - min;
+      return {
+        kind: 'numeric', min, max, stops,
+        color: v => (typeof v === 'number' && Number.isFinite(v))
+          ? rampColor(stops, span === 0 ? 0.5 : (v - min) / span)
+          : '#6b7680',
+        norm: v => (typeof v === 'number' && Number.isFinite(v))
+          ? (span === 0 ? 0.5 : (v - min) / span) : null
+      };
+    }
+    const cats = [...new Set(values.map(v => v === null || v === undefined ? '(sin dato)' : String(v)))].sort();
+    const lookup = new Map(cats.map((c, i) => [c, CATEGORICAL[i % CATEGORICAL.length]]));
+    return {
+      kind: 'categorical', cats, lookup,
+      color: v => lookup.get(v === null || v === undefined ? '(sin dato)' : String(v)) || '#6b7680',
+      norm: () => null
+    };
+  }
+
+  function popupHtml(row) {
+    const parts = [];
+    for (const k in row) {
+      const v = row[k];
+      const s = v === null || v === undefined ? '—'
+        : (typeof v === 'number' ? fmtNum(v) : String(v));
+      parts.push(`<div><span class="pk">${k}:</span> <b>${s}</b></div>`);
+    }
+    return parts.join('');
+  }
+
+  // fit: si es true, encuadra el mapa a los datos dibujados. Solo hace falta al mostrar
+  // un resultado nuevo — en redibujados por cambios de color/paleta/mes/etc. movería la
+  // vista sin que el usuario lo pida.
+  function drawMap(fit) {
+    ensureMap();
+    if (dataLayer) { map.removeLayer(dataLayer); dataLayer = null; }
+    if (contextLayer) { map.removeLayer(contextLayer); contextLayer = null; }
+
+    if (!mapState) {
+      mapHint.style.display = 'block';
+      mapHint.innerHTML = 'Esta consulta no se puede mapear.<br>' +
+        'Necesita columnas <code>lat</code> / <code>lon</code>, o una columna de <code>id</code> ' +
+        'que matchee los features de una capa GeoJSON cargada.';
+      document.getElementById('map').style.display = 'none';
+      renderLegend(null);
+      return;
+    }
+    mapHint.style.display = 'none';
+    document.getElementById('map').style.display = 'block';
+    map.invalidateSize();
+
+    const { mode } = mapState;
+    const colorCol = colorColSelect.value;
+    const paletteKey = paletteSelect.value;
+    const scaleSize = sizeToggle.checked;
+
+    let rows = mapState.rows;
+    const monthSel = mapState.months.length ? Number(monthSlider.value) : 0;
+    if (monthSel > 0) {
+      const month = mapState.months[monthSel - 1];
+      rows = rows.filter(r => monthKey(r[mapState.dateCol]) === month);
+    }
+
+    const capped = rows.slice(0, MAX_MAP_FEATURES);
+    const values = capped.map(r => r[colorCol]);
+    const fixedMin = colorMinInput.value === '' ? NaN : Number(colorMinInput.value);
+    const fixedMax = colorMaxInput.value === '' ? NaN : Number(colorMaxInput.value);
+    const scale = buildColorFn(values, paletteKey, fixedMin, fixedMax);
+
+    const items = [];
+    let skipped = 0;
+
+    if (mode === 'points') {
+      for (const row of capped) {
+        const lat = row[mapState.latCol], lon = row[mapState.lonCol];
+        if (typeof lat !== 'number' || typeof lon !== 'number'
+            || !Number.isFinite(lat) || !Number.isFinite(lon)) { skipped++; continue; }
+        const v = row[colorCol];
+        const t = scale.norm(v);
+        const radius = scaleSize && t !== null ? 5 + t * 14 : 8;
+        const m = L.circleMarker([lat, lon], {
+          radius,
+          fillColor: scale.color(v),
+          fillOpacity: 0.88,
+          color: '#0d1114',
+          weight: 1.5
+        });
+        m.bindPopup(popupHtml(row));
+        items.push(m);
+      }
+    } else {
+      // join por atributo: el id del resultado matchea el id del feature GeoJSON
+      const layer = geoLayers.get(mapState.layerName);
+      for (const row of capped) {
+        const id = row[mapState.idCol];
+        const f = id === null || id === undefined ? null : layer.byId.get(String(id));
+        if (!f || !f.geometry) { skipped++; continue; }
+        const v = row[colorCol];
+        const t = scale.norm(v);
+        const col = scale.color(v);
+        const gtype = f.geometry.type;
+        const isLine = gtype === 'LineString' || gtype === 'MultiLineString';
+        const style = isLine
+          ? { color: col, weight: scaleSize && t !== null ? 2 + t * 8 : 4, opacity: 0.95 }
+          : { fillColor: col, fillOpacity: 0.88, color: '#0d1114', weight: 1.5 };
+        const gl = L.geoJSON(f, {
+          style: () => style,
+          pointToLayer: (feat, latlng) => L.circleMarker(latlng, {
+            radius: scaleSize && t !== null ? 5 + t * 14 : 8, ...style
+          })
+        });
+        gl.bindPopup(popupHtml(row));
+        items.push(gl);
+      }
+    }
+
+    dataLayer = L.layerGroup(items).addTo(map);
+
+    if (contextToggle.checked) drawContext();
+
+    if (fit && items.length) {
+      const group = L.featureGroup(items);
+      try { map.fitBounds(group.getBounds().pad(0.15)); } catch (e) { /* bounds vacío */ }
+    }
+
+    renderLegend(scale, colorCol, items.length, skipped, rows.length);
+  }
+
+  // Capas geo cargadas dibujadas en gris tenue debajo del resultado, para dar
+  // referencia espacial sin robar protagonismo (headers, cañerías, etc.).
+  function drawContext() {
+    const painted = mapState && mapState.mode === 'join' ? mapState.layerName : null;
+    const ctx = [];
+    for (const [name, layer] of geoLayers) {
+      if (name === painted) continue;
+      if (layer.features.length > MAX_MAP_FEATURES) continue;
+      ctx.push(L.geoJSON(layer.features, {
+        style: { color: '#3a444e', weight: 1.5, opacity: 0.7 },
+        pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+          radius: 3, fillColor: '#3a444e', fillOpacity: 0.8, weight: 0
+        }),
+        onEachFeature: (f, l) => {
+          const id = featureId(f);
+          if (id) l.bindTooltip(id, { direction: 'top' });
+        }
+      }));
+    }
+    if (!ctx.length) return;
+    contextLayer = L.layerGroup(ctx).addTo(map);
+    contextLayer.eachLayer(l => l.bringToBack && l.bringToBack());
+    if (baseLayer) baseLayer.bringToBack();
+  }
+
+  function renderLegend(scale, colorCol, shown, skipped, total) {
+    if (!legendCtl || !legendCtl._div) return;
+    const el = legendCtl._div;
+    if (!scale) { el.innerHTML = ''; el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    let html = `<div class="legend-title" title="${colorCol}">${colorCol}</div>`;
+    if (scale.kind === 'numeric') {
+      html += `<div class="bar" style="background:${cssGradient(scale.stops)}"></div>`;
+      html += `<div class="ends"><span>${fmtNum(scale.min)}</span><span>${fmtNum(scale.max)}</span></div>`;
+    } else {
+      for (const c of scale.cats.slice(0, 14)) {
+        html += `<div class="cat"><i style="background:${scale.lookup.get(c)}"></i>${c}</div>`;
+      }
+      if (scale.cats.length > 14) html += `<div class="note">+${scale.cats.length - 14} más</div>`;
+    }
+    let note = `${shown.toLocaleString('es-AR')} de ${total.toLocaleString('es-AR')} filas`;
+    if (skipped) note += ` · ${skipped} sin geometría`;
+    html += `<div class="note">${note}</div>`;
+    el.innerHTML = html;
+  }
+
+  // ── Gráfico ──────────────────────────────────────────────────────────────
+
+  function fillColSelect(select, options, withNone) {
+    const prev = select.value;
+    select.innerHTML = '';
+    if (withNone) {
+      const o = document.createElement('option');
+      o.value = '';
+      o.textContent = '— ninguno —';
+      select.appendChild(o);
+    }
+    for (const c of options) {
+      const o = document.createElement('option');
+      o.value = c;
+      o.textContent = c;
+      select.appendChild(o);
+    }
+    const keepPrev = options.includes(prev) || (withNone && prev === '');
+    select.value = keepPrev ? prev : (withNone ? '' : (options[0] || ''));
+  }
+
+  function prepareChart(rows, dateCols) {
+    const cols = rows && rows.length ? Object.keys(rows[0]) : [];
+    const numericCols = cols.filter(c => isNumericCol(rows, c));
+    if (numericCols.length < 2) {
+      chartState = null;
+      tabChart.disabled = true;
+      if (activeTab === 'chart') switchTab('table');
+      return;
+    }
+    chartState = { rows, cols, numericCols, dateCols };
+
+    fillColSelect(chartXSelect, numericCols, false);
+    fillColSelect(chartYSelect, numericCols, false);
+    if (chartXSelect.value === chartYSelect.value) {
+      chartYSelect.value = numericCols.find(c => c !== chartXSelect.value) || numericCols[0];
+    }
+    fillColSelect(chartHueSelect, cols, true);
+    updateChartHueContinuous();
+
+    tabChart.disabled = false;
+    if (activeTab === 'chart') drawChart();
+  }
+
+  // Habilita el toggle de escala continua solo si `hue` es numérica o fecha;
+  // para cualquier otra columna (texto, bool) el toggle queda oculto y sin efecto.
+  function updateChartHueContinuous() {
+    const hueCol = chartHueSelect.value;
+    const eligible = !!hueCol && !!chartState &&
+      (chartState.numericCols.includes(hueCol) || chartState.dateCols.has(hueCol));
+    chartHueContinuousLabel.style.display = eligible ? '' : 'none';
+    if (!eligible) chartHueContinuous.checked = false;
+  }
+
+  function drawChart() {
+    if (!chartState) return;
+    const xCol = chartXSelect.value, yCol = chartYSelect.value, hueCol = chartHueSelect.value;
+    if (!xCol || !yCol) return;
+
+    const isDateHue = !!hueCol && chartState.dateCols.has(hueCol);
+    const isNumericHue = !!hueCol && chartState.numericCols.includes(hueCol);
+    const continuous = chartHueContinuous.checked && (isDateHue || isNumericHue);
+
+    let datasets, legendDisplay = false;
+    chartLegend.style.display = 'none';
+
+    if (continuous) {
+      const points = [];
+      for (const r of chartState.rows) {
+        const x = r[xCol], y = r[yCol];
+        if (typeof x !== 'number' || typeof y !== 'number') continue;
+        const raw = r[hueCol];
+        let v = null;
+        if (isDateHue) {
+          if (raw !== null && raw !== undefined) {
+            const t = new Date(raw).getTime();
+            v = Number.isFinite(t) ? t : null;
+          }
+        } else if (typeof raw === 'number' && Number.isFinite(raw)) {
+          v = raw;
+        }
+        points.push({ x, y, v });
+      }
+      const scale = buildColorFn(points.map(p => p.v), 'blue_red');
+      datasets = [{
+        label: hueCol,
+        data: points,
+        backgroundColor: points.map(p => scale.color(p.v)),
+        pointRadius: 3
+      }];
+      if (scale.kind === 'numeric') {
+        chartLegend.style.display = 'block';
+        const fmt = isDateHue ? fmtTimeAxis : fmtNum;
+        chartLegend.innerHTML =
+          `<div class="legend-title" title="${hueCol}">${hueCol}</div>` +
+          `<div class="bar" style="background:${cssGradient(scale.stops)}"></div>` +
+          `<div class="ends"><span>${fmt(scale.min)}</span><span>${fmt(scale.max)}</span></div>`;
+      }
+    } else {
+      const groups = new Map();
+      for (const r of chartState.rows) {
+        const x = r[xCol], y = r[yCol];
+        if (typeof x !== 'number' || typeof y !== 'number') continue;
+        const hue = hueCol ? (r[hueCol] === null || r[hueCol] === undefined ? '(sin valor)' : String(r[hueCol])) : 'Serie';
+        if (!groups.has(hue)) groups.set(hue, []);
+        groups.get(hue).push({ x, y });
+      }
+      datasets = [...groups.entries()].map(([label, data], i) => ({
+        label,
+        data,
+        backgroundColor: CATEGORICAL[i % CATEGORICAL.length],
+        pointRadius: 3
+      }));
+      legendDisplay = hueCol !== '';
+    }
+
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(chartCanvas, {
+      type: 'scatter',
+      data: { datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { title: { display: true, text: xCol, color: '#8b96a3' }, ticks: { color: '#8b96a3' }, grid: { color: '#2a323a' } },
+          y: { title: { display: true, text: yCol, color: '#8b96a3' }, ticks: { color: '#8b96a3' }, grid: { color: '#2a323a' } }
+        },
+        plugins: {
+          legend: { display: legendDisplay, labels: { color: '#e7eaee' } }
+        }
+      }
+    });
+  }
+
+  // ── Barras ───────────────────────────────────────────────────────────────
+  // Pinta la consulta tal cual (sin agregar): la agregación vive en el SQL.
+
+  const BARS_MAX_CATEGORIES = 60;
+  let barsInstance = null;
+  let barsState = null;   // { rows, cols, numericCols }
+
+  function prepareBars(rows) {
+    const cols = rows && rows.length ? Object.keys(rows[0]) : [];
+    const numericCols = cols.filter(c => isNumericCol(rows, c));
+    if (!numericCols.length || cols.length < 2) {
+      barsState = null;
+      tabBars.disabled = true;
+      if (activeTab === 'bars') switchTab('table');
+      return;
+    }
+    barsState = { rows, cols, numericCols };
+    fillColSelect(barsXSelect, cols, false);
+    fillColSelect(barsYSelect, numericCols, false);
+    if (barsXSelect.value === barsYSelect.value) {
+      barsXSelect.value = cols.find(c => c !== barsYSelect.value) || cols[0];
+    }
+    fillColSelect(barsHueSelect, cols, true);
+    tabBars.disabled = false;
+    if (activeTab === 'bars') drawBars();
+  }
+
+  function drawBars() {
+    if (!barsState) return;
+    const xCol = barsXSelect.value, yCol = barsYSelect.value, hueCol = barsHueSelect.value;
+    if (!xCol || !yCol) return;
+
+    const labelOf = v => (v === null || v === undefined ? '(sin valor)' : String(v));
+    const labels = [];
+    const labelIdx = new Map();
+    const series = new Map();   // hue -> Map(labelIdx -> y)
+    let repeated = 0;
+    for (const r of barsState.rows) {
+      const y = r[yCol];
+      if (typeof y !== 'number' || !Number.isFinite(y)) continue;
+      const x = labelOf(r[xCol]);
+      if (!labelIdx.has(x)) {
+        if (labels.length >= BARS_MAX_CATEGORIES) continue;
+        labelIdx.set(x, labels.length);
+        labels.push(x);
+      }
+      const hue = hueCol ? labelOf(r[hueCol]) : yCol;
+      if (!series.has(hue)) series.set(hue, new Map());
+      const byX = series.get(hue);
+      const i = labelIdx.get(x);
+      if (byX.has(i)) { repeated++; continue; }   // se queda la primera fila
+      byX.set(i, y);
+    }
+
+    const notes = [];
+    if (repeated) {
+      notes.push(`${repeated.toLocaleString('es-AR')} filas repetidas en (${xCol}${hueCol ? ', ' + hueCol : ''}) ignoradas: ` +
+        `agregá con GROUP BY${hueCol ? '' : ' o elegí una columna en "Colorear por"'}`);
+    }
+    const distinctX = new Set(barsState.rows.map(r => labelOf(r[xCol]))).size;
+    if (distinctX > BARS_MAX_CATEGORIES) notes.push(`mostrando ${BARS_MAX_CATEGORIES} de ${distinctX} categorías`);
+    barsHint.style.display = notes.length ? 'block' : 'none';
+    barsHint.textContent = notes.join(' · ');
+
+    const stacked = barsStacked.checked;
+    const datasets = [...series.entries()].map(([label, byX], i) => ({
+      label,
+      data: labels.map((_, k) => (byX.has(k) ? byX.get(k) : null)),
+      backgroundColor: CATEGORICAL[i % CATEGORICAL.length]
+    }));
+    const axis = text => ({ title: { display: true, text, color: '#8b96a3' }, ticks: { color: '#8b96a3' }, grid: { color: '#2a323a' } });
+
+    if (barsInstance) barsInstance.destroy();
+    barsInstance = new Chart(barsCanvas, {
+      type: 'bar',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { x: { ...axis(xCol), stacked }, y: { ...axis(yCol), stacked } },
+        plugins: { legend: { display: !!hueCol, labels: { color: '#e7eaee' } } }
+      }
+    });
+  }
+
+  // ── Tiempo ───────────────────────────────────────────────────────────────
+
+  function fmtTimeAxis(ms) {
+    const d = new Date(ms);
+    const hasTime = d.getUTCHours() || d.getUTCMinutes() || d.getUTCSeconds();
+    return hasTime
+      ? d.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : d.toLocaleDateString('es-AR');
+  }
+
+  function prepareTime(rows, dateCols) {
+    const cols = rows && rows.length ? Object.keys(rows[0]) : [];
+    const numericCols = cols.filter(c => isNumericCol(rows, c));
+    if (!numericCols.length) {
+      timeState = null;
+      tabTime.disabled = true;
+      if (activeTab === 'time') switchTab('table');
+      return;
+    }
+    const xCandidates = cols.filter(c => dateCols.has(c) || numericCols.includes(c));
+    timeState = { rows, dateCols, numericCols };
+
+    fillColSelect(timeXSelect, xCandidates, false);
+    const firstDate = xCandidates.find(c => dateCols.has(c));
+    if (firstDate && !dateCols.has(timeXSelect.value)) timeXSelect.value = firstDate;
+    fillColSelect(timeYSelect, numericCols, false);
+    if (timeXSelect.value === timeYSelect.value) {
+      timeYSelect.value = numericCols.find(c => c !== timeXSelect.value) || numericCols[0];
+    }
+    fillColSelect(timeHueSelect, cols, true);
+    fillColSelect(timeSerie1Select, numericCols, false);
+    if (timeSerie1Select.value === timeXSelect.value) {
+      timeSerie1Select.value = numericCols.find(c => c !== timeXSelect.value) || numericCols[0];
+    }
+    fillColSelect(timeSerie2Select, numericCols, true);
+    resetTimeLimits();
+
+    tabTime.disabled = false;
+    if (activeTab === 'time') drawTime();
+  }
+
+  // Extrae un punto {x, y} de una fila para el eje de tiempo, o null si no es graficable.
+  function timePoint(r, xCol, yCol, isDateX) {
+    let x = r[xCol];
+    const y = r[yCol];
+    if (typeof y !== 'number') return null;
+    if (isDateX) {
+      if (typeof x !== 'string') return null;
+      x = new Date(x).getTime();
+      if (!Number.isFinite(x)) return null;
+    } else if (typeof x !== 'number') {
+      return null;
+    }
+    return { x, y };
+  }
+
+  function seriesPoints(xCol, yCol, isDateX) {
+    const pts = [];
+    for (const r of timeState.rows) {
+      const p = timePoint(r, xCol, yCol, isDateX);
+      if (p) pts.push(p);
+    }
+    pts.sort((a, b) => a.x - b.x);
+    return pts;
+  }
+
+  // Estilo de dataset según el tipo elegido para la serie (barra / línea / punto).
+  function styleForSeriesType(kind, color) {
+    const [r, g, b] = hexToRgb(color);
+    const bg = `rgba(${r}, ${g}, ${b}, 0.75)`;
+    if (kind === 'bar') return { type: 'bar', backgroundColor: bg, borderColor: color, borderWidth: 1 };
+    if (kind === 'point') return { type: 'line', showLine: false, borderColor: color, backgroundColor: color, pointBackgroundColor: color, pointBorderColor: color, pointRadius: 4 };
+    return { type: 'line', showLine: true, borderColor: color, backgroundColor: bg, borderWidth: 2, pointRadius: 3, tension: 0 };
+  }
+
+  function resetTimeLimits() {
+    const isDateX = timeState && timeState.dateCols.has(timeXSelect.value);
+    timeMinInput.type = isDateX ? 'date' : 'number';
+    timeMaxInput.type = isDateX ? 'date' : 'number';
+    timeMinInput.value = '';
+    timeMaxInput.value = '';
+  }
+
+  function parseTimeLimit(raw, isDateX) {
+    if (!raw) return NaN;
+    const v = isDateX ? new Date(raw).getTime() : Number(raw);
+    return Number.isFinite(v) ? v : NaN;
+  }
+
+  function drawTime() {
+    if (!timeState) return;
+    const xCol = timeXSelect.value;
+    if (!xCol) return;
+    const isDateX = timeState.dateCols.has(xCol);
+    const mode = timeModeSelect.value;
+
+    let datasets, yTitle, legendDisplay;
+    const y1Scale = {};
+
+    if (mode === 'compare') {
+      const s1Col = timeSerie1Select.value, s2Col = timeSerie2Select.value;
+      if (!s1Col) return;
+      datasets = [{
+        label: s1Col,
+        data: seriesPoints(xCol, s1Col, isDateX),
+        yAxisID: 'y',
+        ...styleForSeriesType(timeSerie1Type.value, CATEGORICAL[0])
+      }];
+      yTitle = s1Col;
+      if (s2Col) {
+        datasets.push({
+          label: s2Col,
+          data: seriesPoints(xCol, s2Col, isDateX),
+          yAxisID: 'y1',
+          ...styleForSeriesType(timeSerie2Type.value, CATEGORICAL[1])
+        });
+        y1Scale.y1 = {
+          beginAtZero: true, position: 'right',
+          title: { display: true, text: s2Col, color: '#8b96a3' },
+          ticks: { color: '#8b96a3' },
+          grid: { drawOnChartArea: false }
+        };
+      }
+      legendDisplay = datasets.length > 1;
+    } else {
+      const yCol = timeYSelect.value, hueCol = timeHueSelect.value;
+      if (!yCol) return;
+      const groups = new Map();
+      for (const r of timeState.rows) {
+        const p = timePoint(r, xCol, yCol, isDateX);
+        if (!p) continue;
+        const hue = hueCol ? (r[hueCol] === null || r[hueCol] === undefined ? '(sin valor)' : String(r[hueCol])) : 'Serie';
+        if (!groups.has(hue)) groups.set(hue, []);
+        groups.get(hue).push(p);
+      }
+      for (const pts of groups.values()) pts.sort((a, b) => a.x - b.x);
+
+      datasets = [...groups.entries()].map(([label, data], i) => {
+        const color = CATEGORICAL[i % CATEGORICAL.length];
+        const [r, g, b] = hexToRgb(color);
+        return { label, data, yAxisID: 'y', type: 'bar', borderColor: color, backgroundColor: `rgba(${r}, ${g}, ${b}, 0.75)`, borderWidth: 1 };
+      });
+      yTitle = yCol;
+      legendDisplay = hueCol !== '';
+    }
+
+    const xScale = {
+      type: 'linear',
+      title: { display: true, text: xCol, color: '#8b96a3' },
+      ticks: { color: '#8b96a3', callback: isDateX ? (v) => fmtTimeAxis(v) : undefined },
+      grid: { color: '#2a323a' }
+    };
+    const minVal = parseTimeLimit(timeMinInput.value, isDateX);
+    const maxVal = parseTimeLimit(timeMaxInput.value, isDateX);
+    if (Number.isFinite(minVal)) xScale.min = minVal;
+    if (Number.isFinite(maxVal)) xScale.max = maxVal;
+
+    if (timeInstance) timeInstance.destroy();
+    timeInstance = new Chart(timeCanvas, {
+      type: 'bar',
+      data: { datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        parsing: false,
+        scales: {
+          x: xScale,
+          y: { beginAtZero: true, position: 'left', title: { display: true, text: yTitle, color: '#8b96a3' }, ticks: { color: '#8b96a3' }, grid: { color: '#2a323a' } },
+          ...y1Scale
+        },
+        plugins: {
+          legend: { display: legendDisplay, labels: { color: '#e7eaee' } }
+        }
+      }
+    });
+  }
+
+  function switchTab(which) {
+    activeTab = which;
+    tabTable.classList.toggle('active', which === 'table');
+    tabMap.classList.toggle('active', which === 'map');
+    tabChart.classList.toggle('active', which === 'chart');
+    tabBars.classList.toggle('active', which === 'bars');
+    tabTime.classList.toggle('active', which === 'time');
+    mapControls.classList.toggle('visible', which === 'map');
+    chartControls.classList.toggle('visible', which === 'chart');
+    barsControls.classList.toggle('visible', which === 'bars');
+    timeControls.classList.toggle('visible', which === 'time');
+    resultsScroll.classList.toggle('controls-mode', which === 'map' || which === 'chart' || which === 'bars' || which === 'time');
+    mapPane.style.display = which === 'map' ? 'block' : 'none';
+    chartPane.style.display = which === 'chart' ? 'block' : 'none';
+    barsPane.style.display = which === 'bars' ? 'block' : 'none';
+    timePane.style.display = which === 'time' ? 'block' : 'none';
+    const hasRows = lastResultRows && lastResultRows.length;
+    resultsTable.style.display = which === 'table' && hasRows ? 'table' : 'none';
+    placeholder.style.display = which === 'table' && !hasRows ? 'block' : 'none';
+    if (which === 'map') drawMap(true);
+    if (which === 'chart') drawChart();
+    if (which === 'bars') drawBars();
+    if (which === 'time') drawTime();
+  }
+
+  tabTable.addEventListener('click', () => switchTab('table'));
+  tabMap.addEventListener('click', () => { if (!tabMap.disabled) switchTab('map'); });
+  tabChart.addEventListener('click', () => { if (!tabChart.disabled) switchTab('chart'); });
+  tabBars.addEventListener('click', () => { if (!tabBars.disabled) switchTab('bars'); });
+  tabTime.addEventListener('click', () => { if (!tabTime.disabled) switchTab('time'); });
+  colorColSelect.addEventListener('change', () => {
+    colorMinInput.value = '';
+    colorMaxInput.value = '';
+    if (activeTab === 'map') drawMap();
+  });
+  paletteSelect.addEventListener('change', () => { if (activeTab === 'map') drawMap(); });
+  colorMinInput.addEventListener('input', () => { if (activeTab === 'map') drawMap(); });
+  colorMaxInput.addEventListener('input', () => { if (activeTab === 'map') drawMap(); });
+  monthSlider.addEventListener('input', () => {
+    const v = Number(monthSlider.value);
+    monthSliderLabel.textContent = v === 0 ? 'Todos' : monthLabel(mapState.months[v - 1]);
+    if (activeTab === 'map') drawMap();
+  });
+  sizeToggle.addEventListener('change', () => { if (activeTab === 'map') drawMap(); });
+  contextToggle.addEventListener('change', () => { if (activeTab === 'map') drawMap(); });
+  basemapSelect.addEventListener('change', () => setBasemap(basemapSelect.value));
+  chartXSelect.addEventListener('change', () => { if (activeTab === 'chart') drawChart(); });
+  chartYSelect.addEventListener('change', () => { if (activeTab === 'chart') drawChart(); });
+  chartHueSelect.addEventListener('change', () => { updateChartHueContinuous(); if (activeTab === 'chart') drawChart(); });
+  chartHueContinuous.addEventListener('change', () => { if (activeTab === 'chart') drawChart(); });
+  for (const el of [barsXSelect, barsYSelect, barsHueSelect, barsStacked]) {
+    el.addEventListener('change', () => { if (activeTab === 'bars') drawBars(); });
+  }
+  timeXSelect.addEventListener('change', () => { resetTimeLimits(); if (activeTab === 'time') drawTime(); });
+  timeYSelect.addEventListener('change', () => { if (activeTab === 'time') drawTime(); });
+  timeHueSelect.addEventListener('change', () => { if (activeTab === 'time') drawTime(); });
+  timeModeSelect.addEventListener('change', () => {
+    const mode = timeModeSelect.value;
+    timeHueControls.style.display = mode === 'hue' ? 'contents' : 'none';
+    timeCompareControls.style.display = mode === 'compare' ? 'contents' : 'none';
+    if (activeTab === 'time') drawTime();
+  });
+  timeSerie1Select.addEventListener('change', () => { if (activeTab === 'time') drawTime(); });
+  timeSerie1Type.addEventListener('change', () => { if (activeTab === 'time') drawTime(); });
+  timeSerie2Select.addEventListener('change', () => { if (activeTab === 'time') drawTime(); });
+  timeSerie2Type.addEventListener('change', () => { if (activeTab === 'time') drawTime(); });
+  timeMinInput.addEventListener('change', () => { if (activeTab === 'time') drawTime(); });
+  timeMaxInput.addEventListener('change', () => { if (activeTab === 'time') drawTime(); });
+
+  // ── Export ───────────────────────────────────────────────────────────────
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function exportCsv() {
+    if (!lastQuery) return;
+    try {
+      setStatus('Generando CSV…');
+      const outName = `export_${Date.now()}.csv`;
+      // COPY (...) no admite el ';' final que suele traer la consulta
+      const query = lastQuery.trim().replace(/;+\s*$/, '');
+      await conn.query(`COPY (${query}) TO '${outName}' (HEADER, DELIMITER ',')`);
+      const buf = await db.copyFileToBuffer(outName);
+      downloadBlob(new Blob([buf], { type: 'text/csv' }), outName);
+      setStatus('CSV descargado.', 'ok');
+    } catch (err) {
+      setStatus('Error exportando CSV: ' + err.message, 'error');
+    }
+  }
+
+  function exportXlsx() {
+    if (!lastResultRows || !lastResultRows.length) return;
+    try {
+      setStatus('Generando Excel…');
+      const ws = XLSX.utils.json_to_sheet(lastResultRows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Resultado');
+      XLSX.writeFile(wb, `export_${Date.now()}.xlsx`);
+      setStatus('Excel descargado.', 'ok');
+    } catch (err) {
+      setStatus('Error exportando Excel: ' + err.message, 'error');
+    }
+  }
+
+  // ── Pegado tolerante ─────────────────────────────────────────────────────
+  // Roadmap §3, requisito 3: extraer el SQL ejecutable de un pegado con fences
+  // o prosa alrededor (respuesta típica de un LLM), en vez de pegarlo crudo.
+
+  function extractSqlFromPaste(raw) {
+    const fenceMatch = raw.match(/```(?:sql)?\s*\n?([\s\S]*?)```/i);
+    if (fenceMatch) return fenceMatch[1].trim();
+    const kwMatch = raw.match(/\b(SELECT|WITH)\b[\s\S]*/i);
+    if (kwMatch) return kwMatch[0].trim();
+    return null;
+  }
+
+  function handleSqlPaste(e) {
+    const raw = (e.clipboardData || window.clipboardData).getData('text');
+    const cleaned = extractSqlFromPaste(raw);
+    if (cleaned === null) {
+      setStatus('No se encontró SQL ejecutable en el pegado — se pegó tal cual.', 'error');
+      return;
+    }
+    if (cleaned === raw.trim()) return; // ya venía limpio, no hace falta avisar
+    e.preventDefault();
+    const start = sqlBox.selectionStart, end = sqlBox.selectionEnd;
+    sqlBox.value = sqlBox.value.slice(0, start) + cleaned + sqlBox.value.slice(end);
+    sqlBox.selectionStart = sqlBox.selectionEnd = start + cleaned.length;
+    setStatus('SQL extraído del pegado (se descartó texto alrededor).', 'ok');
+  }
+
+  // ── Log local de consultas ───────────────────────────────────────────────
+  // Roadmap §3, requisito 6: registrar pregunta/comentario + SQL en localStorage
+  // para autodocumentar el uso real del visor.
+
+  const QUERY_LOG_KEY = 'parquetViewerQueryLog';
+  const QUERY_LOG_MAX = 200;
+
+  function loadQueryLog() {
+    try {
+      return JSON.parse(localStorage.getItem(QUERY_LOG_KEY)) || [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveQueryLogEntry(comentario, sql) {
+    const log = loadQueryLog();
+    log.push({ timestamp: new Date().toISOString(), comentario, sql });
+    while (log.length > QUERY_LOG_MAX) log.shift();
+    localStorage.setItem(QUERY_LOG_KEY, JSON.stringify(log));
+  }
+
+  function csvEscape(value) {
+    return `"${String(value).replace(/"/g, '""')}"`;
+  }
+
+  function exportQueryLog() {
+    const log = loadQueryLog();
+    if (!log.length) {
+      setStatus('El historial local está vacío — todavía no guardaste ninguna consulta.', 'error');
+      return;
+    }
+    const header = ['timestamp', 'comentario', 'sql'].join(',');
+    const rows = log.map(e => [csvEscape(e.timestamp), csvEscape(e.comentario), csvEscape(e.sql)].join(','));
+    const csv = [header, ...rows].join('\n');
+    downloadBlob(new Blob([csv], { type: 'text/csv' }), `historial_consultas_${Date.now()}.csv`);
+    setStatus(`Historial exportado (${log.length} entradas).`, 'ok');
+  }
+
+  function saveCurrentQueryToLog() {
+    const sql = sqlBox.value.trim();
+    if (!sql) {
+      setStatus('No hay SQL en el editor para guardar.', 'error');
+      return;
+    }
+    saveQueryLogEntry(logComment.value.trim(), sql);
+    logComment.value = '';
+    setStatus('Guardado en el historial local.', 'ok');
+  }
+
+  // ── Consultas de ejemplo ─────────────────────────────────────────────────
+
+  const EXAMPLES = [
+    {
+      label: 'Química: boro y litio por campaña, misma base',
+      sql: `WITH chem AS (
+    SELECT '10.3 RC 2009-2010' AS source_table, well_id AS hole_id,
+           to_m - from_m AS len_m, li_mg_l, b_mg_l
+    FROM t10_3_rc_brine_chemistry
+    UNION ALL
+    SELECT '10.5 DDH 2010', well_id, to_m - from_m, li_mg_l, b_mg_l
+    FROM t10_5_ddh_brine_chemistry
+    UNION ALL
+    SELECT '10.7 piezometers 2017-2019', borehole_id, to_m - from_m, li_mg_l,
+           h3bo3_mg_l * 0.1748                      -- boric acid -> elemental B
+    FROM t10_7_piezometer_brine_chemistry
+)
+SELECT source_table,
+       COUNT(DISTINCT hole_id)                               AS n_holes,
+       COUNT(*)                                              AS n_intervals,
+       SUM(len_m)                                            AS metres,
+       ROUND(SUM(li_mg_l * len_m) / SUM(len_m), 0)           AS li_wavg_mg_l,
+       ROUND(SUM(b_mg_l * len_m) / SUM(len_m), 0)            AS b_wavg_mg_l,
+       ROUND(MIN(b_mg_l), 0)                                 AS b_min_mg_l,
+       ROUND(MAX(b_mg_l), 0)                                 AS b_max_mg_l,
+       ROUND(SUM(b_mg_l * len_m) / SUM(li_mg_l * len_m), 2)  AS b_li_ratio
+FROM chem
+GROUP BY source_table
+ORDER BY source_table;`
+    },
+    {
+      label: 'Piezómetros: perfil de Li ponderado por longitud (mapa)',
+      sql: `WITH profile AS (
+    SELECT c.piezometer_id,
+           COUNT(*)                                                       AS n_intervals,
+           MIN(c.from_m)                                                  AS profile_top_m,
+           MAX(c.to_m)                                                    AS profile_bottom_m,
+           SUM(c.li_mg_l * (c.to_m - c.from_m)) / SUM(c.to_m - c.from_m)  AS li_wavg_mg_l,
+           SUM(c.mg_mg_l * (c.to_m - c.from_m))
+             / SUM(c.li_mg_l * (c.to_m - c.from_m))                       AS mg_li_wavg
+    FROM t10_7_piezometer_brine_chemistry c
+    GROUP BY c.piezometer_id
+)
+SELECT p.piezometer_id, z.borehole_id, p.n_intervals,
+       p.profile_top_m, p.profile_bottom_m,
+       ROUND(p.li_wavg_mg_l, 0) AS li_wavg_mg_l,
+       ROUND(p.mg_li_wavg, 2)   AS mg_li_wavg,
+       w.easting, w.northing, w.lat, w.lon, w.xy_conflicto
+FROM profile p
+JOIN t10_6_piezometers z ON z.piezometer_id = p.piezometer_id
+LEFT JOIN wells w        ON w.pozo_id = z.borehole_id
+ORDER BY li_wavg_mg_l DESC;`
+    },
+    {
+      label: 'Pozos de producción: cuántos hay, por programa',
+      sql: `SELECT programa,
+       CASE programa
+           WHEN 'PRODUCCION_10_8'   THEN 'drilled, detailed in Table 10.8'
+           WHEN 'PRODUCCION_2024'   THEN 'infill 2024, under construction'
+           WHEN 'MODELO_APENDICE_2' THEN 'reserve model only, not confirmed'
+           WHEN 'APENDICE_1'        THEN 'Appendix 1 only, not confirmed'
+       END                                              AS status,
+       COUNT(*)                                         AS n_wells,
+       SUM(CASE WHEN xy_conflicto THEN 1 ELSE 0 END)    AS n_xy_conflict,
+       COUNT(z_collar)                                  AS n_with_z_collar
+FROM wells
+WHERE programa LIKE 'PRODUCCION%'
+   OR programa IN ('MODELO_APENDICE_2', 'APENDICE_1')
+GROUP BY programa
+ORDER BY n_wells DESC;`
+    }
+  ];
+
+  for (const ex of EXAMPLES) {
+    const o = document.createElement('option');
+    o.value = ex.sql;
+    o.textContent = ex.label;
+    examplesSelect.appendChild(o);
+  }
+  examplesSelect.addEventListener('change', () => {
+    if (!examplesSelect.value) return;
+    sqlBox.value = examplesSelect.value;
+    if (db) runBtn.disabled = false;
+    examplesSelect.selectedIndex = 0;
+  });
+
+  // ── Carga de archivos ────────────────────────────────────────────────────
+
+  pickFolderBtn.addEventListener('click', () => folderInput.click());
+  pickFilesBtn.addEventListener('click', () => filesInput.click());
+
+  async function handleFileSelection(e, triggerBtn, doneLabel) {
+    const all = Array.from(e.target.files || []);
+    const parquets = all.filter(f => /\.parquet$/i.test(f.name));
+    const geos = all.filter(f => /\.(?:geojson|json)$/i.test(f.name) && !/^basemap_/i.test(f.name));
+
+    // Fondo offline: cada `basemap_<nombre>.json` con su imagen al lado. La imagen
+    // puede estar en otra subcarpeta de la selección: se busca por el `image_file`
+    // que declara el json.
+    const imagesByName = new Map(all.filter(f => /\.(png|jpe?g)$/i.test(f.name))
+                                    .map(f => [f.name.toLowerCase(), f]));
+    const boundsFiles = all.filter(f => /^basemap_.*\.json$/i.test(f.name));
+
+    if (!parquets.length && !geos.length && !boundsFiles.length) return;
+    emptyHint.style.display = 'none';
+    pickFolderBtn.disabled = true;
+    pickFilesBtn.disabled = true;
+    if (!db) await initDuckDB();
+    const collisions = [];
+    for (const file of parquets) await registerParquetFile(file, collisions);
+    for (const file of geos) await registerGeoJsonFile(file, collisions);
+    for (const bf of boundsFiles) await registerLocalBasemap(bf, imagesByName);
+    pickFolderBtn.disabled = false;
+    pickFilesBtn.disabled = false;
+    triggerBtn.textContent = doneLabel;
+    collapseSection('fileProgress', true);
+    runBtn.disabled = false;
+    setStatus(`${parquets.length} parquet + ${geos.length} geojson cargados` +
+      (localBasemaps.size ? ` + ${localBasemaps.size} fondo(s) offline` : '') +
+      (collisions.length ? ` ⚠ ojo: nombres repetidos (se pisaron): ${collisions.join(', ')}` : '') +
+      '. Probá una consulta de ejemplo.', collisions.length ? 'error' : 'ok');
+    e.target.value = '';
+  }
+
+  folderInput.addEventListener('change', (e) => handleFileSelection(e, pickFolderBtn, 'Elegir otra carpeta'));
+  filesInput.addEventListener('change', (e) => handleFileSelection(e, pickFilesBtn, 'Elegir más archivos'));
+
+  // ── Carga de metadata e índice ───────────────────────────────────────────
+  // Botones separados a propósito de handleFileSelection: cargar tablas no debe
+  // arrastrar fichas ni índice, ni cargar metadata debe registrar tablas de datos.
+
+  pickMetadataBtn.addEventListener('click', () => metadataInput.click());
+  pickIndexBtn.addEventListener('click', () => indexInput.click());
+
+  function refreshFichaSelect() {
+    fichaWrap.style.display = tableFichas.size ? 'block' : 'none';
+    const current = fichaSelect.value;
+    fichaSelect.replaceChildren(new Option('— elegí una tabla —', ''));
+    for (const name of [...tableFichas.keys()].sort()) {
+      fichaSelect.appendChild(new Option(name, name));
+    }
+    fichaSelect.value = tableFichas.has(current) ? current : '';
+    fichaOut.textContent = tableFichas.get(fichaSelect.value) || '';
+    sectionCount('fichaCount', tableFichas.size);
+  }
+
+  fichaSelect.addEventListener('change', () => {
+    fichaOut.textContent = tableFichas.get(fichaSelect.value) || '';
+  });
+
+  async function handleMetadataSelection(e) {
+    const all = Array.from(e.target.files || []);
+    // Todo .yaml de la carpeta es una ficha, salvo 99_audit: nunca se lee — no se
+    // muestra al usuario ni viaja al agente (ADR-014).
+    const fichaFiles = all.filter(f => /\.ya?ml$/i.test(f.name)
+      && !/99_audit/i.test(f.webkitRelativePath || ''));
+
+    if (!fichaFiles.length) {
+      setStatus('No se encontraron fichas (.yaml) dentro de lo elegido.', 'error');
+      return;
+    }
+    pickMetadataBtn.disabled = true;
+
+    const line = addFileLog(`fichas — leyendo ${fichaFiles.length}…`);
+    try {
+      for (const f of fichaFiles) {
+        tableFichas.set(f.name.replace(/\.ya?ml$/i, ''), await f.text());
+      }
+      line.textContent = `fichas — ✓ ${fichaFiles.length.toLocaleString('es-AR')} tablas`;
+      line.className = 'file-progress ok';
+      refreshFichaSelect();
+    } catch (err) {
+      line.textContent = `fichas — error: ${err.message}`;
+      line.className = 'file-progress err';
+      console.error(err);
+    }
+
+    pickMetadataBtn.disabled = false;
+    pickMetadataBtn.textContent = 'Elegir otra metadata';
+    setStatus(`Metadata cargada: ${fichaFiles.length} ficha(s).`, 'ok');
+    e.target.value = '';
+  }
+
+  metadataInput.addEventListener('change', handleMetadataSelection);
+
+  // El índice: el .txt separado por `|` con encabezado que escribe el ETL de
+  // metadata, con cualquier nombre. Se registra como la vista `table_index`.
+  async function handleIndexSelection(e) {
+    const file = (e.target.files || [])[0];
+    if (!file) return;
+    pickIndexBtn.disabled = true;
+    if (!db) await initDuckDB();
+
+    const line = addFileLog(`${file.name} — cargando…`);
+    try {
+      await db.registerFileText('table_index.txt', await file.text());
+      await conn.query(
+        `CREATE OR REPLACE VIEW "table_index" AS SELECT * FROM read_csv('table_index.txt', delim='|', header=true, quote='"')`
+      );
+      const countRes = await conn.query(`SELECT count(*) AS n FROM "table_index"`);
+      const n = Number(countRes.toArray()[0].toJSON().n);
+      line.textContent = `${file.name} — ✓ ${n.toLocaleString('es-AR')} tablas`;
+      line.className = 'file-progress ok';
+      addTableToList('table_index', n);
+      setStatus(`Índice cargado en table_index: ${n.toLocaleString('es-AR')} tablas.`, 'ok');
+    } catch (err) {
+      line.textContent = `${file.name} — error: ${err.message}`;
+      line.className = 'file-progress err';
+      setStatus(`No se pudo leer el índice: ${err.message}`, 'error');
+      console.error(err);
+    }
+
+    pickIndexBtn.disabled = false;
+    pickIndexBtn.textContent = 'Elegir otro índice';
+    e.target.value = '';
+  }
+
+  indexInput.addEventListener('change', handleIndexSelection);
+
+  runBtn.addEventListener('click', runQuery);
+  sqlBox.addEventListener('paste', handleSqlPaste);
+  sqlBox.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      runQuery();
+    }
+  });
+  exportCsvBtn.addEventListener('click', exportCsv);
+  exportXlsxBtn.addEventListener('click', exportXlsx);
+  logSaveBtn.addEventListener('click', saveCurrentQueryToLog);
+  logExportBtn.addEventListener('click', exportQueryLog);
+  document.getElementById('saveSqlBtn').addEventListener('click', async () => {
+    const blob = new Blob([sqlBox.value], { type: 'text/plain' });
+    if (!window.showSaveFilePicker) return downloadBlob(blob, 'consulta.sql');  // Firefox/Safari
+    try {
+      const h = await showSaveFilePicker({ suggestedName: 'consulta.sql', types: [{ accept: { 'text/plain': ['.sql'] } }] });
+      const w = await h.createWritable(); await w.write(blob); await w.close();
+    } catch (e) { if (e.name !== 'AbortError') downloadBlob(blob, 'consulta.sql'); }
+  });
+  const sqlInput = document.getElementById('sqlInput');
+  document.getElementById('loadSqlBtn').addEventListener('click', () => sqlInput.click());
+  sqlInput.addEventListener('change', async () => {
+    const file = sqlInput.files[0];
+    sqlInput.value = '';   // permite recargar el mismo archivo
+    if (!file) return;
+    if (file.size > 1e6) return setStatus(`${file.name} supera 1 MB: no se cargó.`, 'error');
+    sqlBox.value = await file.text();
+    sqlBox.focus();
+    setStatus(`${file.name} cargado en el editor (no se ejecutó).`, 'ok');
+  });
+  prevQueryBtn.addEventListener('click', () => goToHistory(-1));
+  nextQueryBtn.addEventListener('click', () => goToHistory(1));
+</script>
+
+</body>
+</html>

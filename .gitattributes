@@ -1,0 +1,2 @@
+# example datasets: LF everywhere (the YAML bytes are hashed into the parquet provenance)
+examples/** text=auto eol=lf

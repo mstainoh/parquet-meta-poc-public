@@ -1,0 +1,10 @@
+pozo_a,pozo_b,dist_m,prog_a,prog_b,relacion
+DD17D-003,W-30,0.0,DDH_2017_2019,MODELO_APENDICE_2,mismo_sitio_por_coordenada
+DD17D-012,W17-12,0.0,DDH_2017_2019,MODELO_APENDICE_2,mismo_sitio_por_coordenada
+DD18D-004,W-13,0.0,DDH_2017_2019,PRODUCCION_10_8,mismo_sitio_por_coordenada
+DD18D-005,W18-05,0.0,DDH_2017_2019,PRODUCCION_10_8,mismo_sitio_por_coordenada
+DD18D-006,W18-06,0.0,DDH_2017_2019,PRODUCCION_10_8,mismo_sitio_por_coordenada
+DDH-04A,W10-04,1.0,DDH_2009_2010,PRODUCCION_10_8,mismo_sitio_por_coordenada
+PE-11,WR-28,5.0,RC_2009_2010,PRODUCCION_10_8,mismo_sitio_por_coordenada
+PE-15,W-8,0.0,RC_2009_2010,PRODUCCION_10_8,mismo_sitio_por_coordenada
+W-10,W-7,0.0,PRODUCCION_10_8,PRODUCCION_10_8,mismo_sitio_por_coordenada

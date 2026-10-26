@@ -1,0 +1,234 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.991564",
+  "row_count": 56,
+  "file_columns": [
+    "tabla",
+    "tabla_apendice",
+    "pag_impresa",
+    "pozo_id",
+    "pag_pdf",
+    "well_id",
+    "x_raw",
+    "y_raw",
+    "easting_m",
+    "northing_m",
+    "top_model_masl",
+    "screen_top_masl",
+    "screen_bottom_masl",
+    "start_year",
+    "end_year",
+    "pumping_year1_lps",
+    "pumping_years2_40_lps",
+    "drawdown_year1_m",
+    "drawdown_year10_m",
+    "drawdown_year20_m",
+    "drawdown_year30_m",
+    "drawdown_year40_m",
+    "li_year1_mgl",
+    "li_year10_mgl",
+    "li_year20_mgl",
+    "li_year30_mgl",
+    "li_year40_mgl",
+    "nota"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "tabla_apendice": "str",
+    "pag_impresa": "int64",
+    "pozo_id": "str",
+    "pag_pdf": "int64",
+    "well_id": "str",
+    "x_raw": "str",
+    "y_raw": "str",
+    "easting_m": "float64",
+    "northing_m": "float64",
+    "top_model_masl": "float64",
+    "screen_top_masl": "float64",
+    "screen_bottom_masl": "float64",
+    "start_year": "int64",
+    "end_year": "int64",
+    "pumping_year1_lps": "float64",
+    "pumping_years2_40_lps": "float64",
+    "drawdown_year1_m": "float64",
+    "drawdown_year10_m": "float64",
+    "drawdown_year20_m": "float64",
+    "drawdown_year30_m": "float64",
+    "drawdown_year40_m": "float64",
+    "li_year1_mgl": "float64",
+    "li_year10_mgl": "float64",
+    "li_year20_mgl": "float64",
+    "li_year30_mgl": "float64",
+    "li_year40_mgl": "float64",
+    "nota": "str"
+  },
+  "null_count": {
+    "tabla": 0,
+    "tabla_apendice": 0,
+    "pag_impresa": 0,
+    "pozo_id": 0,
+    "pag_pdf": 0,
+    "well_id": 0,
+    "x_raw": 0,
+    "y_raw": 0,
+    "easting_m": 0,
+    "northing_m": 0,
+    "top_model_masl": 0,
+    "screen_top_masl": 0,
+    "screen_bottom_masl": 0,
+    "start_year": 0,
+    "end_year": 0,
+    "pumping_year1_lps": 0,
+    "pumping_years2_40_lps": 0,
+    "drawdown_year1_m": 0,
+    "drawdown_year10_m": 0,
+    "drawdown_year20_m": 0,
+    "drawdown_year30_m": 0,
+    "drawdown_year40_m": 0,
+    "li_year1_mgl": 0,
+    "li_year10_mgl": 0,
+    "li_year20_mgl": 0,
+    "li_year30_mgl": 0,
+    "li_year40_mgl": 0,
+    "nota": 52
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "tabla_apendice": 1,
+    "pag_impresa": 2,
+    "pozo_id": 56,
+    "pag_pdf": 2,
+    "well_id": 56,
+    "x_raw": 51,
+    "y_raw": 54,
+    "easting_m": 51,
+    "northing_m": 54,
+    "top_model_masl": 56,
+    "screen_top_masl": 30,
+    "screen_bottom_masl": 39,
+    "start_year": 2,
+    "end_year": 1,
+    "pumping_year1_lps": 18,
+    "pumping_years2_40_lps": 19,
+    "drawdown_year1_m": 53,
+    "drawdown_year10_m": 55,
+    "drawdown_year20_m": 55,
+    "drawdown_year30_m": 55,
+    "drawdown_year40_m": 55,
+    "li_year1_mgl": 56,
+    "li_year10_mgl": 56,
+    "li_year20_mgl": 56,
+    "li_year30_mgl": 56,
+    "li_year40_mgl": 55,
+    "nota": 4
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 430,
+      "max": 431
+    },
+    "pag_pdf": {
+      "min": 446,
+      "max": 447
+    },
+    "easting_m": {
+      "min": 3419086.0,
+      "max": 3433225.0
+    },
+    "northing_m": {
+      "min": 7375500.0,
+      "max": 7405308.0
+    },
+    "top_model_masl": {
+      "min": 3935.62,
+      "max": 3946.79
+    },
+    "screen_top_masl": {
+      "min": 3390.0,
+      "max": 3902.67
+    },
+    "screen_bottom_masl": {
+      "min": 3335.0,
+      "max": 3749.95
+    },
+    "start_year": {
+      "min": 1,
+      "max": 2
+    },
+    "end_year": {
+      "min": 40,
+      "max": 40
+    },
+    "pumping_year1_lps": {
+      "min": 0.0,
+      "max": 29.58
+    },
+    "pumping_years2_40_lps": {
+      "min": 8.0,
+      "max": 29.58
+    },
+    "drawdown_year1_m": {
+      "min": 0.07,
+      "max": 92.3
+    },
+    "drawdown_year10_m": {
+      "min": 3.84,
+      "max": 99.14
+    },
+    "drawdown_year20_m": {
+      "min": 5.29,
+      "max": 103.56
+    },
+    "drawdown_year30_m": {
+      "min": 7.2,
+      "max": 107.41
+    },
+    "drawdown_year40_m": {
+      "min": 9.21,
+      "max": 110.72
+    },
+    "li_year1_mgl": {
+      "min": 492.26,
+      "max": 813.95
+    },
+    "li_year10_mgl": {
+      "min": 495.39,
+      "max": 801.33
+    },
+    "li_year20_mgl": {
+      "min": 467.29,
+      "max": 797.26
+    },
+    "li_year30_mgl": {
+      "min": 428.87,
+      "max": 791.61
+    },
+    "li_year40_mgl": {
+      "min": 401.36,
+      "max": 785.15
+    }
+  },
+  "file_size_bytes": 36068,
+  "file_index_columns": [],
+  "file_uniques": [
+    "pozo_id",
+    "well_id",
+    "top_model_masl",
+    "li_year1_mgl",
+    "li_year10_mgl",
+    "li_year20_mgl",
+    "li_year30_mgl"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [
+    {
+      "source_col": "pozo_id",
+      "target_table": "wells",
+      "target_col": "pozo_id",
+      "orphans": []
+    }
+  ],
+  "fk_verified": true
+}

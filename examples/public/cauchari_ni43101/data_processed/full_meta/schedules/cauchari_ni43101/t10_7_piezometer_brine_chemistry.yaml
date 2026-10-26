@@ -1,0 +1,79 @@
+schema_version: null
+keys:
+  uniques:
+  - piezometer_id
+  - from_m
+  - to_m
+  not_nulls:
+  - piezometer_id
+  - from_m
+  - to_m
+  foreign_keys:
+  - source_col: piezometer_id
+    target_table: t10_6_piezometers
+    target_col: piezometer_id
+  - source_col: borehole_id
+    target_table: wells
+    target_col: pozo_id
+semantics:
+  description: 'Brine chemistry averaged over depth intervals for the 2017-2019 piezometer
+    boreholes (Li, K, Mg, H3BO3, SO4, Mg/Li). Source: NI 43-101 technical report on
+    the Cauchari-Olaroz operation (effective Jan 8 2025), Table 10.7 (printed p.158-160,
+    PDF p.174-176).'
+  grain: one row per piezometer and depth interval - an interval average, not a point
+    sample
+  caveats: 'The source''s first column is titled ''DD Borehole ID'' but holds PIEZOMETER
+    names; it was renamed piezometer_name and normalized to piezometer_id, and borehole_id
+    was added by lookup in Table 10.6. The header typos ''Lenth'' (length_m) and ''Plataform''
+    are source typos. Concentrations are mg/L; boron is reported as H3BO3. mg_li_orig
+    is as printed (1 decimal), mg_li_recalc is computed. The intervals are bailer
+    profiles of the hole, not the piezometer screen. The DD19D-001 rows continue the
+    DL-001 profile but belong to a different borehole (DD19D-001). To compare boron
+    with b_mg_l of Tables 10.3/10.5 convert first: B = H3BO3 x 0.1748. Every row is
+    already an average over an interval of very different length: weight by interval
+    length when averaging, and do not pool Tables 10.3, 10.5 and 10.7 without considering
+    campaign, sampling method and laboratory.'
+  temporal_scope: campaign_window
+  cross_tables:
+  - t10_6_piezometers
+  - wells
+  column_info:
+    tabla: report table number the row was extracted from
+    pag_impresa: printed page of the report where the row is
+    pag_pdf: PDF page of the row (printed page + 16)
+    nota: free-text flag written at extraction (source typo, outlier, reconstructed
+      row, cross-check result); empty = nothing to flag
+    piezometer_name: name as printed (e.g. DL-003B)
+    piezometer_id: normalized piezometer id; joins `t10_6_piezometers.piezometer_id`
+    borehole_id: drill hole of the piezometer, from Table 10.6; joins `wells.pozo_id`
+    interval_raw: interval text as printed
+    from_m: interval top, m
+    to_m: interval bottom, m
+    length_m: interval length (equals to_m - from_m)
+    li_mg_l: lithium, mg/L
+    k_mg_l: potassium, mg/L
+    mg_mg_l: magnesium, mg/L
+    h3bo3_mg_l: boric acid H3BO3, mg/L (not elemental boron)
+    so4_mg_l: sulfate, mg/L
+    mg_li_orig: Mg/Li as printed
+    mg_li_recalc: Mg/Li computed from mg_mg_l / li_mg_l
+inspect: null
+file_columns:
+- tabla
+- pag_impresa
+- pag_pdf
+- piezometer_name
+- interval_raw
+- from_m
+- to_m
+- length_m
+- li_mg_l
+- k_mg_l
+- mg_mg_l
+- h3bo3_mg_l
+- so4_mg_l
+- mg_li_orig
+- mg_li_recalc
+- nota
+- piezometer_id
+- borehole_id

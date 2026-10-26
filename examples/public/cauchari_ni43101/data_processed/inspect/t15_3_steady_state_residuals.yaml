@@ -1,0 +1,14 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 27
+observed_by: claude
+findings:
+- columns:
+  - well_id
+  - northing_m
+  - observed_gw_elev_masl
+  severity: note
+  note: >-
+    DDH-17 has northing 7343262, about 13 km south of the southernmost other hole of the dataset (DD19D-15) and
+    20 km south of the next Table 15.3 point (PE-08), and its observed level is above the others. Footnote *: reported
+    as flowing well; the model uses a censoring target. Kept and flagged.

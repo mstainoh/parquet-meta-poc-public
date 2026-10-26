@@ -1,0 +1,22 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 7
+observed_by: claude
+findings:
+  - columns: [analysis, procedure]
+    severity: note
+    note: >-
+      Scope per sections 11.3 and 11.8.1 (text p.176 and p.181): these procedures were run by D.B. Stephens
+      & Associates (Albuquerque, USA) on undisturbed core from DDH-1 through DDH-18 (2009-2011). The text
+      gives counts: 1,244 undisturbed samples collected, RBRC on 865, particle size on 58, dry bulk density
+      on 36. Text p.151 instead says "832 undisturbed samples were tested", fewer than the 865 RBRC. There
+      were also 33 RBRC samples from DD19D-PE09 in 2019, lab not stated. No results are tabulated.
+  - columns: [analysis]
+    severity: note
+    note: >-
+      Text p.182-183/PDF 198-199: dry bulk density, moisture content and total porosity "are not used in
+      the Mineral Resource and Reserve Estimates". Specific gravity was measured on only 4 samples
+      (2.47-2.75 g/cm3), judged skewed by salt, and an assumed particle density of 2.65 g/cm3 was used for
+      all others. RBRC (suction 0.2-0.3 bar for 18-24 h, oven at 110 C) is the specific yield input.
+      Particle size results were classified by USDA. The on-site Exar porosity lab (total porosity by gas
+      pycnometer) is not in this table, was not used for estimates and was no longer operational in 2024.

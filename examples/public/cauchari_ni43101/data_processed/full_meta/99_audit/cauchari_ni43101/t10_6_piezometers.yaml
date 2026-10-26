@@ -1,0 +1,47 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t10_6_piezometers.yaml
+source_sha256: 49524e0b23bd216e11f526851439a2472a25bef9021ff6a82bee84aa4824e3c1
+git_commit: null
+written_at: '2026-10-26 12:00:18.183198'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - borehole_id\n    - piezometer_id\n\
+  \    - piezometer_name\n    not_nulls:\n    - borehole_id\n    - piezometer_name\n\
+  \    foreign_keys:\n    - source_col: borehole_id\n      target_table: wells\n \
+  \     target_col: pozo_id\n  semantics:\n    description: >-\n      Piezometers\
+  \ installed in the 2017-2019 DDH/RC boreholes: screen interval, depth and coordinates\n\
+  \      (Gauss-Kruger zone 3 by magnitude; the table does not declare its CRS, EPSG:22183\
+  \ is assumed - see\n      DATASET.md). Source: NI 43-101 technical report on the\
+  \ Cauchari-Olaroz operation (effective Jan\n      8 2025), Table 10.6 (printed p.154-155,\
+  \ PDF p.170-171).\n    grain: one row per piezometer (several piezometers - SL/ML\
+  \ - can share one borehole)\n    caveats: >-\n      Model borehole -> piezometer\
+  \ as N:1: borehole_id is the physical collar (use it to join `wells`);\n      a\
+  \ collar id derived during extraction from the piezometer number mixed shallow and\
+  \ deep holes that\n      are tens of metres apart, so it was dropped. dd_borehole_id/piezometer_name\
+  \ keep the raw text; borehole_id/piezometer_id\n      are normalized (spaces removed,\
+  \ 3-digit numbers: DL-08 -> DL-008, 'DL-003 B' -> DL-003B). For DD18D-001..007\n\
+  \      the source puts the state ('Cemented'/'Abandoned') in the piezometer column;\
+  \ it was moved to `status`\n      and piezometer_id is empty, with no screen data.\
+  \ DD19D-PE09 comes split in two lines in the source\n      and was rebuilt (diameter\
+  \ 2in read from the image). Platform text such as '3 13 14' is kept raw.\n     \
+  \ By design SL and ML share one borehole and DL is a separate hole nearby; sites\
+  \ that break this are\n      in inspect. Screen depths are m below top of well (mbtw).\n\
+  \    temporal_scope: campaign_window\n    cross_tables:\n    - t10_7_piezometer_brine_chemistry\n\
+  \    - wells\n    - t15_3_steady_state_residuals\n    column_info:\n      tabla:\
+  \ report table number the row was extracted from\n      pag_impresa: printed page\
+  \ of the report where the row is\n      pag_pdf: PDF page of the row (printed page\
+  \ + 16)\n      nota: >-\n        free-text flag written at extraction (source typo,\
+  \ outlier, reconstructed row, cross-check result);\n        empty = nothing to flag\n\
+  \      borehole_id: normalized drill hole id (physical collar); joins `wells.pozo_id`\n\
+  \      piezometer_id: normalized piezometer id (SL/ML/DL-nnn[B]); empty for cemented/abandoned\
+  \ holes\n      status: >-\n        cemented / abandoned when the source says so\
+  \ in place of a piezometer name; empty otherwise\n      dd_borehole_id: borehole\
+  \ id as printed\n      piezometer_name: piezometer text as printed\n      screen_diameter_in:\
+  \ screen diameter in inches\n      platform_raw: drill platform text as printed\
+  \ (may list several)\n      total_depth_m: total depth in m\n      screen_top_mbtw:\
+  \ top of screen, m below top of well\n      screen_base_mbtw: base of screen, m\
+  \ below top of well\n      x_coordinate_m: 'easting, EPSG:22183 (X first in this\
+  \ table: NOT swapped)'\n      y_coordinate_m: northing, EPSG:22183\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

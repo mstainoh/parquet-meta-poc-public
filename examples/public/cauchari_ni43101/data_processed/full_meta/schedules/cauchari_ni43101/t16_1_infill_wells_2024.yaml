@@ -1,0 +1,51 @@
+schema_version: null
+keys:
+  uniques:
+  - borehole_id
+  not_nulls:
+  - borehole_id
+  foreign_keys:
+  - source_col: pozo_id
+    target_table: wells
+    target_col: pozo_id
+semantics:
+  description: 'Infill production wells 44, 45 and 46 (2024) with platform, contractor,
+    stage and coordinates. Source: NI 43-101 technical report on the Cauchari-Olaroz
+    operation (effective Jan 8 2025), Table 16.1 (printed p.283, PDF p.299).'
+  grain: one row per infill well
+  caveats: Stage is a snapshot at report date. The table says location 'Olaroz'. Wells
+    44-46 are not in Appendix 2.
+  temporal_scope: current_state
+  cross_tables:
+  - wells
+  column_info:
+    tabla: report table number the row was extracted from
+    pag_impresa: printed page of the report where the row is
+    pag_pdf: PDF page of the row (printed page + 16)
+    nota: free-text flag written at extraction (source typo, outlier, reconstructed
+      row, cross-check result); empty = nothing to flag
+    borehole_id: well label as printed ('Pozo 44')
+    pozo_id: canonical id POZO-nn; joins `wells.pozo_id`
+    platform: drill platform id
+    stage: construction stage as printed
+    x_raw: X as printed (easting)
+    y_raw: Y as printed (northing)
+    easting_m: easting EPSG:22183
+    northing_m: northing EPSG:22183
+inspect: null
+file_columns:
+- tabla
+- pag_impresa
+- pag_pdf
+- pozo_id
+- borehole_id
+- type
+- platform
+- contractor
+- stage
+- location
+- x_raw
+- y_raw
+- easting_m
+- northing_m
+- nota

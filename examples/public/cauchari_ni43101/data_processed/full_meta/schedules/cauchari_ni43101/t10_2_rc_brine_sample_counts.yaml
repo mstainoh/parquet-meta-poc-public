@@ -1,0 +1,35 @@
+schema_version: null
+keys:
+  uniques:
+  - description
+  not_nulls:
+  - description
+  foreign_keys: []
+semantics:
+  description: 'Counts of brine samples collected and submitted for laboratory analysis,
+    by sample type. Source: NI 43-101 technical report on the Cauchari-Olaroz operation
+    (effective Jan 8 2025), Table 10.2 (printed p.148, PDF p.164).'
+  grain: one row per sample category as printed (includes subtotal and total rows)
+  caveats: Rows mix categories and their totals (e.g. 'Total Field Samples'); do not
+    sum the column across rows. The counts cover only the 2009-2010 programs (RC and
+    DDH) and include holes with no row in the chemistry tables. Commas in the source
+    are thousands separators.
+  temporal_scope: campaign_window
+  cross_tables:
+  - t10_3_rc_brine_chemistry
+  column_info:
+    tabla: report table number the row was extracted from
+    pag_impresa: printed page of the report where the row is
+    pag_pdf: PDF page of the row (printed page + 16)
+    nota: free-text flag written at extraction (source typo, outlier, reconstructed
+      row, cross-check result); empty = nothing to flag
+    description: sample category as printed, including subtotal/total rows
+    brine_samples: number of brine samples
+inspect: null
+file_columns:
+- tabla
+- pag_impresa
+- pag_pdf
+- description
+- brine_samples
+- nota

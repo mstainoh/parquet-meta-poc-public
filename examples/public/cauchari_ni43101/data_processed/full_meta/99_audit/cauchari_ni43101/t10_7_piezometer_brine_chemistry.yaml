@@ -1,0 +1,45 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t10_7_piezometer_brine_chemistry.yaml
+source_sha256: e1fc9b4636b78e175aab29aaae01eb304877376281a9589826300b0254dfb500
+git_commit: null
+written_at: '2026-10-26 12:00:18.202285'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - piezometer_id\n    - from_m\n  \
+  \  - to_m\n    not_nulls:\n    - piezometer_id\n    - from_m\n    - to_m\n    foreign_keys:\n\
+  \    - source_col: piezometer_id\n      target_table: t10_6_piezometers\n      target_col:\
+  \ piezometer_id\n    - source_col: borehole_id\n      target_table: wells\n    \
+  \  target_col: pozo_id\n  semantics:\n    description: >-\n      Brine chemistry\
+  \ averaged over depth intervals for the 2017-2019 piezometer boreholes (Li, K, Mg,\n\
+  \      H3BO3, SO4, Mg/Li). Source: NI 43-101 technical report on the Cauchari-Olaroz\
+  \ operation (effective\n      Jan 8 2025), Table 10.7 (printed p.158-160, PDF p.174-176).\n\
+  \    grain: one row per piezometer and depth interval - an interval average, not\
+  \ a point sample\n    caveats: >-\n      The source's first column is titled 'DD\
+  \ Borehole ID' but holds PIEZOMETER names; it was renamed\n      piezometer_name\
+  \ and normalized to piezometer_id, and borehole_id was added by lookup in Table\
+  \ 10.6.\n      The header typos 'Lenth' (length_m) and 'Plataform' are source typos.\
+  \ Concentrations are mg/L; boron\n      is reported as H3BO3. mg_li_orig is as printed\
+  \ (1 decimal), mg_li_recalc is computed. The intervals\n      are bailer profiles\
+  \ of the hole, not the piezometer screen. The DD19D-001 rows continue the DL-001\n\
+  \      profile but belong to a different borehole (DD19D-001). To compare boron\
+  \ with b_mg_l of Tables 10.3/10.5\n      convert first: B = H3BO3 x 0.1748. Every\
+  \ row is already an average over an interval of very different\n      length: weight\
+  \ by interval length when averaging, and do not pool Tables 10.3, 10.5 and 10.7\
+  \ without\n      considering campaign, sampling method and laboratory.\n    temporal_scope:\
+  \ campaign_window\n    cross_tables:\n    - t10_6_piezometers\n    - wells\n   \
+  \ column_info:\n      tabla: report table number the row was extracted from\n  \
+  \    pag_impresa: printed page of the report where the row is\n      pag_pdf: PDF\
+  \ page of the row (printed page + 16)\n      nota: >-\n        free-text flag written\
+  \ at extraction (source typo, outlier, reconstructed row, cross-check result);\n\
+  \        empty = nothing to flag\n      piezometer_name: name as printed (e.g. DL-003B)\n\
+  \      piezometer_id: normalized piezometer id; joins `t10_6_piezometers.piezometer_id`\n\
+  \      borehole_id: drill hole of the piezometer, from Table 10.6; joins `wells.pozo_id`\n\
+  \      interval_raw: interval text as printed\n      from_m: interval top, m\n \
+  \     to_m: interval bottom, m\n      length_m: interval length (equals to_m - from_m)\n\
+  \      li_mg_l: lithium, mg/L\n      k_mg_l: potassium, mg/L\n      mg_mg_l: magnesium,\
+  \ mg/L\n      h3bo3_mg_l: boric acid H3BO3, mg/L (not elemental boron)\n      so4_mg_l:\
+  \ sulfate, mg/L\n      mg_li_orig: Mg/Li as printed\n      mg_li_recalc: Mg/Li computed\
+  \ from mg_mg_l / li_mg_l\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

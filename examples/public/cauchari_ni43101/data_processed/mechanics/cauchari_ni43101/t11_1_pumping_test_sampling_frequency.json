@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.929269",
+  "row_count": 8,
+  "file_columns": [
+    "tabla",
+    "pag_impresa",
+    "pag_pdf",
+    "time_interval",
+    "sampling_frequency",
+    "nota"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "pag_impresa": "int64",
+    "pag_pdf": "int64",
+    "time_interval": "str",
+    "sampling_frequency": "str",
+    "nota": "str"
+  },
+  "null_count": {
+    "tabla": 0,
+    "pag_impresa": 0,
+    "pag_pdf": 0,
+    "time_interval": 0,
+    "sampling_frequency": 0,
+    "nota": 8
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "pag_impresa": 1,
+    "pag_pdf": 1,
+    "time_interval": 8,
+    "sampling_frequency": 8,
+    "nota": 0
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 179,
+      "max": 179
+    },
+    "pag_pdf": {
+      "min": 195,
+      "max": 195
+    }
+  },
+  "file_size_bytes": 10636,
+  "file_index_columns": [],
+  "file_uniques": [
+    "time_interval",
+    "sampling_frequency"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [],
+  "fk_verified": true
+}

@@ -1,0 +1,37 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t15_3_steady_state_residuals.yaml
+source_sha256: e72cf0d82f59ef3b1e5e9ec20c0c83eeace9e5fc080e8b91c4bba6aece9e0d57
+git_commit: null
+written_at: '2026-10-26 12:00:18.306804'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - well_id\n    not_nulls:\n    - well_id\n\
+  \    foreign_keys:\n    - source_col: pozo_id\n      target_table: wells\n     \
+  \ target_col: pozo_id\n  semantics:\n    description: >-\n      Steady-state model\
+  \ calibration: observed vs computed groundwater elevation at 27 monitoring locations,\n\
+  \      with XY. Source: NI 43-101 technical report on the Cauchari-Olaroz operation\
+  \ (effective Jan 8 2025),\n      Table 15.3 (printed p.266-267, PDF p.282-283).\n\
+  \    grain: one row per monitoring location\n    caveats: >-\n      Elevations are\
+  \ masl (groundwater ELEVATION), not depth to water. DDH-17 is a flowing well far\
+  \ south\n      of the other points (footnote *): its observed value is a censored\
+  \ model target; kept and flagged.\n      SL-xx are piezometers: pozo_id maps them\
+  \ to their borehole. Levels are of 2018, pre-development\n      conditions, mostly\
+  \ in shallow wells, and are not corrected for brine density. CAU* rows come from\n\
+  \      a third party (Adv. Lithium, 2018), not from the project. well_id is the\
+  \ id as printed (SL-13 has\n      2 digits in the source). The 'Adv. Lithium, 2018'\
+  \ source cells are offset vertically from their\n      rows in the PDF; assigned\
+  \ one-to-one in order.\n    temporal_scope: static\n    cross_tables:\n    - wells\n\
+  \    column_info:\n      tabla: report table number the row was extracted from\n\
+  \      pag_impresa: printed page of the report where the row is\n      pag_pdf:\
+  \ PDF page of the row (printed page + 16)\n      nota: >-\n        free-text flag\
+  \ written at extraction (source typo, outlier, reconstructed row, cross-check result);\n\
+  \        empty = nothing to flag\n      well_id: id as printed\n      pozo_id: canonical\
+  \ id; joins `wells.pozo_id` (SL-xxx -> its borehole, DDH-n -> DDH-nn)\n      x_raw:\
+  \ X as printed (easting)\n      y_raw: Y as printed (northing)\n      easting_m:\
+  \ easting EPSG:22183\n      northing_m: northing EPSG:22183\n      observed_gw_elev_masl:\
+  \ observed groundwater elevation, masl\n      computed_gw_elev_masl: model groundwater\
+  \ elevation, masl\n      residual_m: observed - computed, m\n      residual_raw:\
+  \ residual text as printed (with asterisk)\n      source: who measured it\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

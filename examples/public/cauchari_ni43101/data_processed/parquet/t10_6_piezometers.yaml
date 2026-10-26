@@ -1,0 +1,55 @@
+meta:
+  keys:
+    uniques:
+    - borehole_id
+    - piezometer_id
+    - piezometer_name
+    not_nulls:
+    - borehole_id
+    - piezometer_name
+    foreign_keys:
+    - source_col: borehole_id
+      target_table: wells
+      target_col: pozo_id
+  semantics:
+    description: >-
+      Piezometers installed in the 2017-2019 DDH/RC boreholes: screen interval, depth and coordinates
+      (Gauss-Kruger zone 3 by magnitude; the table does not declare its CRS, EPSG:22183 is assumed - see
+      DATASET.md). Source: NI 43-101 technical report on the Cauchari-Olaroz operation (effective Jan
+      8 2025), Table 10.6 (printed p.154-155, PDF p.170-171).
+    grain: one row per piezometer (several piezometers - SL/ML - can share one borehole)
+    caveats: >-
+      Model borehole -> piezometer as N:1: borehole_id is the physical collar (use it to join `wells`);
+      a collar id derived during extraction from the piezometer number mixed shallow and deep holes that
+      are tens of metres apart, so it was dropped. dd_borehole_id/piezometer_name keep the raw text; borehole_id/piezometer_id
+      are normalized (spaces removed, 3-digit numbers: DL-08 -> DL-008, 'DL-003 B' -> DL-003B). For DD18D-001..007
+      the source puts the state ('Cemented'/'Abandoned') in the piezometer column; it was moved to `status`
+      and piezometer_id is empty, with no screen data. DD19D-PE09 comes split in two lines in the source
+      and was rebuilt (diameter 2in read from the image). Platform text such as '3 13 14' is kept raw.
+      By design SL and ML share one borehole and DL is a separate hole nearby; sites that break this are
+      in inspect. Screen depths are m below top of well (mbtw).
+    temporal_scope: campaign_window
+    cross_tables:
+    - t10_7_piezometer_brine_chemistry
+    - wells
+    - t15_3_steady_state_residuals
+    column_info:
+      tabla: report table number the row was extracted from
+      pag_impresa: printed page of the report where the row is
+      pag_pdf: PDF page of the row (printed page + 16)
+      nota: >-
+        free-text flag written at extraction (source typo, outlier, reconstructed row, cross-check result);
+        empty = nothing to flag
+      borehole_id: normalized drill hole id (physical collar); joins `wells.pozo_id`
+      piezometer_id: normalized piezometer id (SL/ML/DL-nnn[B]); empty for cemented/abandoned holes
+      status: >-
+        cemented / abandoned when the source says so in place of a piezometer name; empty otherwise
+      dd_borehole_id: borehole id as printed
+      piezometer_name: piezometer text as printed
+      screen_diameter_in: screen diameter in inches
+      platform_raw: drill platform text as printed (may list several)
+      total_depth_m: total depth in m
+      screen_top_mbtw: top of screen, m below top of well
+      screen_base_mbtw: base of screen, m below top of well
+      x_coordinate_m: 'easting, EPSG:22183 (X first in this table: NOT swapped)'
+      y_coordinate_m: northing, EPSG:22183

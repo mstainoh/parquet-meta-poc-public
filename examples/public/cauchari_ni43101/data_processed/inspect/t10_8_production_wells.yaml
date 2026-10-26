@@ -1,0 +1,75 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 38
+observed_by: claude
+findings:
+- columns:
+  - pumping_well
+  - year
+  severity: data_error
+  note: >-
+    Text p.161/PDF 177: "Since 2011, a total of 43 production wells have been drilled on the Property". The table
+    has 38 wells (2011-2023), so COUNT(*) here is not the number of production wells drilled: 5 wells are not detailed
+    anywhere in Table 10.8. Table 16.1 numbers the 2024 infill wells "Pozo 44-46", which fits 43 earlier wells.
+    The text does not name the missing 5. Candidates outside 10.8 are the Appendix 2 Table 4 W-ids (W-20..W-30,
+    W-32, W-3, W09-01, W17-12, WR-24, R64/R66/R67), but that is a reserve-model list, not a list of drilled wells.
+- columns:
+  - pumping_well
+  - total_depth_m
+  severity: data_error
+  note: >-
+    total_depth_m of the three 2011 PB wells looks shifted one row: this table prints PB-03A 204, PB-04 201, PB-06A
+    305 m (PDF 178), while Appendix 1 Table 1 (PDF 442) gives PB-03A 201, PB-04 305, PB-06A 194 m (and PB-01 204),
+    and the last drilling interval of this same table ends at 205, 305 and 194 m. A depth query for PB-04 or PB-06A
+    is off by ~105 m; prefer Appendix 1 (tA1_1_exploration_well_locations) or the last interval in t10_8_production_well_intervals.
+    Other wells whose last drilling interval disagrees with total_depth_m (e.g. W-14: 607.7 vs 494 m; WR-10: 355
+    vs 445 m) are not resolved by any other table.
+- columns:
+  - pumping_well
+  - year
+  - total_length_casing_inserted_m
+  - total_length_screen_casing_inserted_m
+  severity: note
+  note: >-
+    Text p.161: "The production well field uses three wells drilled in 2011, these wells had a smaller diameter
+    (8 inches)". This matches PB-03A, PB-04 and PB-06A (2011, 8" casing). The 2018/2019 and later wells are deeper
+    and telescopic, with larger casing in "the upper 200/250 m" and smaller below. Appendix 1 lists PB-01 (2010)
+    and PB-I (2011, 51 m), which are not production wells of this table.
+- columns:
+  - screen_casing
+  severity: note
+  note: >-
+    Text p.161: "The production wells use stainless steel screen". The three 2011 PB wells print Galvanized Steel,
+    so the text's generalisation is wrong for them and the table value is the one to use.
+- columns:
+  - total_length_screen_casing_inserted_m
+  - total_length_casing_inserted_m
+  severity: note
+  note: >-
+    Text p.161: screen sections are "inserted facing the productive horizons" with a minimum length of two metres,
+    solid casing faces halite/clay layers, and "the solid and screen casing alternate through the aquifer". The
+    screen length per diameter is therefore a SUM of several sections, not a continuous interval. Do not derive
+    screen top/bottom depths from it (Appendix 2 Table 4 gives screen top/bottom in masl for the model).
+- columns:
+  - pumping_well
+  - easting
+  - northing
+  severity: note
+  note: >-
+    Coordinate check of the platform grouping of Figure 10.2 'Borehole Locations and Associated Drilling Platforms'
+    (p.157/PDF 173; raster map, labels read visually), nothing changed: W17-06 is 21-32 m from DL-006B/ML-006 (platform
+    03-13-14) in every source. Appendix 2 puts W-02B 0-9 m from DL-002B/ML-002 (platform 04, labelled W-02) while
+    this table puts it 149 m away - evidence for the Appendix 2 position of W-02B. W-1, W-5 and W-7 (this table
+    and Appendix 2) are 3.7, 6.7 and 23-24 km from platforms 01, 07 and 08-15, where the figure labels W-01, W-05,
+    W-07: either different wells with similar names or wrong coordinates, unresolved. 0 m coincidences that agree
+    with the figure: W18-05 = DD18D-005 (platform CS-28), W18-06 = DD18D-006 (platform CS-31); also W-30 = DD17D-003,
+    W17-12 = DD17D-012, W-13 = DD18D-004 (not labelled together in the figure).
+- columns:
+  - pumping_well
+  - easting
+  - northing
+  severity: data_error
+  note: >-
+    W-7 and W-10 print identical coordinates in this table. Appendix 2 Table 4 places W-7 about 1.3 km away from
+    that point, so the W-7 row most likely repeats W-10's coordinates. `wells` keeps this table's value for W-7
+    (xy_conflicto = true); prefer Appendix 2 for W-7.

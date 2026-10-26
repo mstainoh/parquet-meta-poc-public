@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:23.007195",
+  "row_count": 9,
+  "file_columns": [
+    "pozo_a",
+    "pozo_b",
+    "dist_m",
+    "prog_a",
+    "prog_b",
+    "relacion"
+  ],
+  "dtypes": {
+    "pozo_a": "str",
+    "pozo_b": "str",
+    "dist_m": "float64",
+    "prog_a": "str",
+    "prog_b": "str",
+    "relacion": "str"
+  },
+  "null_count": {
+    "pozo_a": 0,
+    "pozo_b": 0,
+    "dist_m": 0,
+    "prog_a": 0,
+    "prog_b": 0,
+    "relacion": 0
+  },
+  "n_distinct": {
+    "pozo_a": 9,
+    "pozo_b": 9,
+    "dist_m": 3,
+    "prog_a": 4,
+    "prog_b": 2,
+    "relacion": 1
+  },
+  "min_max": {
+    "dist_m": {
+      "min": 0.0,
+      "max": 5.0
+    }
+  },
+  "file_size_bytes": 11018,
+  "file_index_columns": [],
+  "file_uniques": [
+    "pozo_a",
+    "pozo_b"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [
+    {
+      "source_col": "pozo_a",
+      "target_table": "wells",
+      "target_col": "pozo_id",
+      "orphans": []
+    },
+    {
+      "source_col": "pozo_b",
+      "target_table": "wells",
+      "target_col": "pozo_id",
+      "orphans": []
+    }
+  ],
+  "fk_verified": true
+}

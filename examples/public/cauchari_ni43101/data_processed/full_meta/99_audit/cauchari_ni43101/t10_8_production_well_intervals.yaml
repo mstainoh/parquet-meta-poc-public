@@ -1,0 +1,31 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t10_8_production_well_intervals.yaml
+source_sha256: af11e03e8e9aa1503692823174a24ef886cbab183672459b96aa8990e5266a46
+git_commit: null
+written_at: '2026-10-26 12:00:18.222284'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - pumping_well\n    - interval_no\n\
+  \    not_nulls:\n    - pumping_well\n    - interval_no\n    foreign_keys:\n    -\
+  \ source_col: pumping_well\n      target_table: t10_8_production_wells\n      target_col:\
+  \ pumping_well\n  semantics:\n    description: >-\n      Drilling intervals (bit\
+  \ diameter and depth range) of the production wells, parsed from the multi-line\n\
+  \      cell of Table 10.8. Source: NI 43-101 technical report on the Cauchari-Olaroz\
+  \ operation (effective\n      Jan 8 2025), Table 10.8 (PDF p.178-182).\n    grain:\
+  \ one row per production well and drilling interval\n    caveats: >-\n      Derived\
+  \ by splitting the 'drilling diameter' cell of Table 10.8; the casing and screen\
+  \ cells were\n      NOT aligned to intervals. In some wells the last interval does\
+  \ not end at total_depth_m of the main\n      table, and a few intervals do not\
+  \ start where the previous one ends (see inspect of the main table).\n    temporal_scope:\
+  \ static\n    cross_tables:\n    - t10_8_production_wells\n    column_info:\n  \
+  \    tabla: report table number the row was extracted from\n      pag_impresa: printed\
+  \ page of the report where the row is\n      pag_pdf: PDF page of the row (printed\
+  \ page + 16)\n      nota: >-\n        free-text flag written at extraction (source\
+  \ typo, outlier, reconstructed row, cross-check result);\n        empty = nothing\
+  \ to flag\n      pumping_well: well id; joins `t10_8_production_wells`\n      interval_no:\
+  \ order of the interval inside the cell, from 1\n      drilling_diameter_raw: text\
+  \ of the interval as printed\n      bit_diameter_inches: bit diameter in inches\
+  \ as decimal\n      from_m: start depth, m\n      to_m: end depth, m\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

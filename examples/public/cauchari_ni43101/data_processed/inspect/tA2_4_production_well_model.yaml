@@ -1,0 +1,15 @@
+schema_version: 1
+observed_at: 2026-10-26
+observed_row_count: 56
+observed_by: claude
+findings:
+- columns:
+  - pozo_id
+  - screen_top_masl
+  - screen_bottom_masl
+  severity: data_error
+  note: >-
+    PB-04: the model screen (3902.67 to 3589.13 masl) does not match Appendix 1, whose land surface and screen depths
+    give 3887.67 to 3649.67 masl. The model screen bottom sits about 358 m below top_model_masl, deeper than the
+    305 m total depth of the well. For the other wells shared with Appendix 1 the two agree within a few metres
+    (PB-03A bottom differs by about 6.6 m). Prefer Appendix 1 for PB-04 screen elevations.

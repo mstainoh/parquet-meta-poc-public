@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.944288",
+  "row_count": 27,
+  "file_columns": [
+    "tabla",
+    "pag_impresa",
+    "pag_pdf",
+    "pozo_id",
+    "well_id",
+    "x_raw",
+    "y_raw",
+    "easting_m",
+    "northing_m",
+    "observed_gw_elev_masl",
+    "computed_gw_elev_masl",
+    "residual_m",
+    "residual_raw",
+    "source",
+    "nota"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "pag_impresa": "int64",
+    "pag_pdf": "int64",
+    "pozo_id": "str",
+    "well_id": "str",
+    "x_raw": "str",
+    "y_raw": "str",
+    "easting_m": "float64",
+    "northing_m": "float64",
+    "observed_gw_elev_masl": "float64",
+    "computed_gw_elev_masl": "float64",
+    "residual_m": "float64",
+    "residual_raw": "str",
+    "source": "str",
+    "nota": "str"
+  },
+  "null_count": {
+    "tabla": 0,
+    "pag_impresa": 0,
+    "pag_pdf": 0,
+    "pozo_id": 0,
+    "well_id": 0,
+    "x_raw": 0,
+    "y_raw": 0,
+    "easting_m": 0,
+    "northing_m": 0,
+    "observed_gw_elev_masl": 0,
+    "computed_gw_elev_masl": 0,
+    "residual_m": 0,
+    "residual_raw": 0,
+    "source": 0,
+    "nota": 21
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "pag_impresa": 2,
+    "pag_pdf": 2,
+    "pozo_id": 27,
+    "well_id": 27,
+    "x_raw": 27,
+    "y_raw": 27,
+    "easting_m": 27,
+    "northing_m": 27,
+    "observed_gw_elev_masl": 27,
+    "computed_gw_elev_masl": 27,
+    "residual_m": 25,
+    "residual_raw": 25,
+    "source": 2,
+    "nota": 3
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 266,
+      "max": 267
+    },
+    "pag_pdf": {
+      "min": 282,
+      "max": 283
+    },
+    "easting_m": {
+      "min": 3418305.0,
+      "max": 3432230.0
+    },
+    "northing_m": {
+      "min": 7343262.0,
+      "max": 7407612.0
+    },
+    "observed_gw_elev_masl": {
+      "min": 3934.26,
+      "max": 3960.71
+    },
+    "computed_gw_elev_masl": {
+      "min": 3936.04,
+      "max": 3959.42
+    },
+    "residual_m": {
+      "min": -6.6,
+      "max": 1.52
+    }
+  },
+  "file_size_bytes": 22698,
+  "file_index_columns": [],
+  "file_uniques": [
+    "pozo_id",
+    "well_id",
+    "x_raw",
+    "y_raw",
+    "easting_m",
+    "northing_m",
+    "observed_gw_elev_masl",
+    "computed_gw_elev_masl"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [
+    {
+      "source_col": "pozo_id",
+      "target_table": "wells",
+      "target_col": "pozo_id",
+      "orphans": []
+    }
+  ],
+  "fk_verified": true
+}

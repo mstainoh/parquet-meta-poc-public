@@ -1,0 +1,39 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: tA2_4_production_well_model.yaml
+source_sha256: 9f66730a240c795ce3e4a42ae135ecef49190303f0105b00ea13613a790e08a7
+git_commit: null
+written_at: '2026-10-26 12:00:18.377285'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - well_id\n    not_nulls:\n    - well_id\n\
+  \    foreign_keys:\n    - source_col: pozo_id\n      target_table: wells\n     \
+  \ target_col: pozo_id\n  semantics:\n    description: >-\n      Production wells\
+  \ of the reserve model (OS4 case): XY, top of model, screen, pumping, predicted\
+  \ drawdown\n      and lithium by year. Source: NI 43-101 technical report on the\
+  \ Cauchari-Olaroz operation (effective\n      Jan 8 2025), Appendix 2 Table 4 (printed\
+  \ p.430-431, PDF p.446-447).\n    grain: one row per production well in the reserve\
+  \ model\n    caveats: >-\n      top_model_masl is the top of the MODEL cell, not\
+  \ the collar elevation (close to, but not always\n      equal to, the Appendix 1\
+  \ land surface). Pumping, drawdown and Li columns are model PREDICTIONS (years\n\
+  \      1/10/20/30/40), not measurements. Id spelling differs from Appendix 1 (WR-3\
+  \ -> WR-03 in pozo_id).\n      Coordinates are printed as integers.\n    temporal_scope:\
+  \ static\n    cross_tables:\n    - t10_8_production_wells\n    - wells\n    column_info:\n\
+  \      tabla: report table number the row was extracted from\n      pag_impresa:\
+  \ printed page of the report where the row is\n      pag_pdf: PDF page of the row\
+  \ (printed page + 16)\n      nota: >-\n        free-text flag written at extraction\
+  \ (source typo, outlier, reconstructed row, cross-check result);\n        empty\
+  \ = nothing to flag\n      well_id: id as printed\n      pozo_id: canonical id;\
+  \ joins `wells.pozo_id`\n      tabla_apendice: table number inside Appendix 2\n\
+  \      x_raw: X as printed (easting)\n      y_raw: Y as printed (northing)\n   \
+  \   easting_m: easting EPSG:22183\n      northing_m: northing EPSG:22183\n     \
+  \ top_model_masl: top of the model at the well, masl (not collar)\n      screen_top_masl:\
+  \ screen top, masl\n      screen_bottom_masl: screen bottom, masl\n      start_year:\
+  \ first pumping year as a MODEL year index (1-40), not a calendar year\n      end_year:\
+  \ last pumping year, model year index (1-40)\n      pumping_year1_lps: pumping rate\
+  \ in model year 1, L/s (0 when the well starts in year 2)\n      pumping_years2_40_lps:\
+  \ pumping rate years 2-40, L/s\n      drawdown_year1_m: predicted drawdown at year\
+  \ 1, m\n      li_year1_mgl: predicted Li at year 1, mg/L (same pattern for years\
+  \ 10/20/30/40)\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

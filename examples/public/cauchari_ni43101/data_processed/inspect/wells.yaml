@@ -1,0 +1,55 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 172
+observed_by: claude
+findings:
+- columns:
+  - programa
+  - pozo_id
+  severity: note
+  note: >-
+    Text p.161/PDF 177 says 43 production wells were drilled since 2011; Table 10.8 details 38 (programa = PRODUCCION_10_8)
+    and the 5 others are not identified in the report (the Pozo 44-46 numbering of Table 16.1 fits 43). programa
+    = MODELO_APENDICE_2 holds wells that appear only in the Appendix 2 reserve-model table; whether they exist physically
+    is not stated.
+- columns:
+  - easting
+  - northing
+  - xy_conflicto
+  severity: note
+  note: >-
+    RC17S-014 / DD17D-014. Text p.152 says shallow and intermediate piezometers share one borehole and the deep
+    hole is 15 m away. In 10.6, SL-014 (and Table 15.3) has exactly DL-014's XY (0 m apart), while ML-014 is 21
+    m away. The registry takes ML-014's XY for RC17S-014, which is the option that fits the text. DD17D-014's XY
+    (copied from 10.6) may be the duplicated one; it is flagged xy_conflicto = false even though it is identical
+    to SL-014's.
+- columns:
+  - pozo_id
+  severity: note
+  note: >-
+    Twin pairs at the same site are not in well_aliases: PE-14/PE-14A (PE-14A drilled 144-228 m below PE-14's 144
+    m; Table 10.1) and DDH-06/DDH-06A. Each pair's chemistry appears under the shallow twin's id while its depths
+    only fit the deep twin (t10_3, t10_5 sidecars). The other twins (DDH-04A, 08A, 09A, 10A, 10B, 12A, 13A-D, PE-17A)
+    have no such conflict in the audited tables. DD19D-PE09 was drilled on platform "PE-09" (Table 10.6), so its
+    XY (3419473/7374367) is a hint of PE-09's location, which has no coordinates. This is an inference only and
+    was not filled in.
+- columns:
+  - pozo_id
+  severity: note
+  note: >-
+    Holes or wells mentioned in sections 10-11 and absent from every table: one of the "three HQ diameter diamond
+    drill holes" of the 2022-2024 southern program (p.168; only DD19D-05/06 are DDH in Table 10.9), and 5 of the
+    43 production wells (p.161). Neither has an id in the text. Spelling variants in the text map to existing ids:
+    "PE-3" = PE-03 (p.148), "DDH19D-001" = DD19D-001 (p.153), "DD19D_PE09" = DD19D-PE09 (p.181), "DDH-1 through
+    DDH18" = DDH-01..DDH-18 (p.176).
+- columns:
+  - pozo_id
+  - easting
+  - northing
+  severity: note
+  note: >-
+    The RC (PE) and DDH 2009-2010 holes without coordinates appear only as dots on Figure 10.2 'Borehole Locations
+    and Associated Drilling Platforms' (p.157/PDF 173; raster map, labels read visually); no table gives their XY.
+    The figure's grouped labels suggest PE-20, DDH-10 and DDH-10B with PB-01; PE-21 with PB-03A; DDH-12 and DDH-12A
+    with PB-04; PE-18 with PB-02 (PB-02 has no XY anywhere). NOT applied: their easting/northing stay NULL. Georeferencing
+    the figure was out of scope.

@@ -1,0 +1,46 @@
+schema_version: null
+keys:
+  uniques:
+  - well_id
+  not_nulls:
+  - well_id
+  foreign_keys:
+  - source_col: well_id
+    target_table: wells
+    target_col: pozo_id
+semantics:
+  description: 'RC (reverse circulation) boreholes PE-01..PE-22 drilled in 2009-2010
+    with the interval and length drilled. Source: NI 43-101 technical report on the
+    Cauchari-Olaroz operation (effective Jan 8 2025), Table 10.1 (printed p.147, PDF
+    p.163).'
+  grain: one row per RC borehole
+  caveats: 'from_m is empty where the source prints ''-'' (it means the hole starts
+    at surface, not 0 declared); only deepened twin holes declare a start. The source
+    prints two column pairs per row; they were unfolded to one row per hole. Use to_m
+    for hole depth and SUM(length_m) only for metres drilled. The table has no coordinates:
+    see `wells` / section 15.3 and Appendix 1 for XY.'
+  temporal_scope: campaign_window
+  cross_tables:
+  - t10_3_rc_brine_chemistry
+  - t10_2_rc_brine_sample_counts
+  - wells
+  column_info:
+    tabla: report table number the row was extracted from
+    pag_impresa: printed page of the report where the row is
+    pag_pdf: PDF page of the row (printed page + 16)
+    nota: free-text flag written at extraction (source typo, outlier, reconstructed
+      row, cross-check result); empty = nothing to flag
+    well_id: RC borehole id, PE-nn; joins `wells.pozo_id`
+    from_m: start of the drilled interval in m; empty = '-' in source
+    to_m: end of the drilled interval in m
+    length_m: metres drilled as printed (equals to_m - from_m in every row)
+inspect: null
+file_columns:
+- tabla
+- pag_impresa
+- pag_pdf
+- well_id
+- from_m
+- to_m
+- length_m
+- nota

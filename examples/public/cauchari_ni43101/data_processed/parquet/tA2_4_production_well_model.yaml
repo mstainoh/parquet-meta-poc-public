@@ -1,0 +1,48 @@
+meta:
+  keys:
+    uniques:
+    - well_id
+    not_nulls:
+    - well_id
+    foreign_keys:
+    - source_col: pozo_id
+      target_table: wells
+      target_col: pozo_id
+  semantics:
+    description: >-
+      Production wells of the reserve model (OS4 case): XY, top of model, screen, pumping, predicted drawdown
+      and lithium by year. Source: NI 43-101 technical report on the Cauchari-Olaroz operation (effective
+      Jan 8 2025), Appendix 2 Table 4 (printed p.430-431, PDF p.446-447).
+    grain: one row per production well in the reserve model
+    caveats: >-
+      top_model_masl is the top of the MODEL cell, not the collar elevation (close to, but not always
+      equal to, the Appendix 1 land surface). Pumping, drawdown and Li columns are model PREDICTIONS (years
+      1/10/20/30/40), not measurements. Id spelling differs from Appendix 1 (WR-3 -> WR-03 in pozo_id).
+      Coordinates are printed as integers.
+    temporal_scope: static
+    cross_tables:
+    - t10_8_production_wells
+    - wells
+    column_info:
+      tabla: report table number the row was extracted from
+      pag_impresa: printed page of the report where the row is
+      pag_pdf: PDF page of the row (printed page + 16)
+      nota: >-
+        free-text flag written at extraction (source typo, outlier, reconstructed row, cross-check result);
+        empty = nothing to flag
+      well_id: id as printed
+      pozo_id: canonical id; joins `wells.pozo_id`
+      tabla_apendice: table number inside Appendix 2
+      x_raw: X as printed (easting)
+      y_raw: Y as printed (northing)
+      easting_m: easting EPSG:22183
+      northing_m: northing EPSG:22183
+      top_model_masl: top of the model at the well, masl (not collar)
+      screen_top_masl: screen top, masl
+      screen_bottom_masl: screen bottom, masl
+      start_year: first pumping year as a MODEL year index (1-40), not a calendar year
+      end_year: last pumping year, model year index (1-40)
+      pumping_year1_lps: pumping rate in model year 1, L/s (0 when the well starts in year 2)
+      pumping_years2_40_lps: pumping rate years 2-40, L/s
+      drawdown_year1_m: predicted drawdown at year 1, m
+      li_year1_mgl: predicted Li at year 1, mg/L (same pattern for years 10/20/30/40)

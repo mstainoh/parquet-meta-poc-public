@@ -1,0 +1,40 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: tA1_1_exploration_well_locations.yaml
+source_sha256: 6ed7032020988655951675b7a25017bb797ade1e6ad81b0013392711de8bea59
+git_commit: null
+written_at: '2026-10-26 12:00:18.347276'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - well_id\n    not_nulls:\n    - well_id\n\
+  \    foreign_keys:\n    - source_col: pozo_id\n      target_table: wells\n     \
+  \ target_col: pozo_id\n  semantics:\n    description: >-\n      Location and construction\
+  \ of exploration/production wells: coordinates, land surface elevation,\n      depth,\
+  \ screen and hydrostratigraphic unit. Source: NI 43-101 technical report on the\
+  \ Cauchari-Olaroz\n      operation (effective Jan 8 2025), Appendix 1 Table 1 (printed\
+  \ p.426-427, PDF p.442-443).\n    grain: one row per well\n    caveats: >-\n   \
+  \   land_surface_elev_masl is the only collar elevation (z_collar) available in\
+  \ the extracted set. The\n      report's note: coordinates of wells built after\
+  \ 2011 come from the DEM; those built in 2010-2011\n      from differential GPS\
+  \ (POSGAR 94). fuente_z_raw applies that note by year_constructed (the selection\n\
+  \      by year is ours; the note speaks of coordinates). Id spelling differs from\
+  \ Appendix 2 (PB-3A/PB-03A,\n      PB4/PB-04, W04-A/W-04A): use pozo_id. 'PB-I'\
+  \ keeps the letter I of the source. CW-62 has elevation\n      'NA' (empty). Multi-unit\
+  \ hsu_raw cells are not split. Depths are m below land surface.\n    temporal_scope:\
+  \ static\n    cross_tables:\n    - wells\n    - tA2_4_production_well_model\n  \
+  \  column_info:\n      tabla: report table number the row was extracted from\n \
+  \     pag_impresa: printed page of the report where the row is\n      pag_pdf: PDF\
+  \ page of the row (printed page + 16)\n      nota: >-\n        free-text flag written\
+  \ at extraction (source typo, outlier, reconstructed row, cross-check result);\n\
+  \        empty = nothing to flag\n      well_id: id as printed\n      pozo_id: canonical\
+  \ id; joins `wells.pozo_id`\n      x_raw: X as printed (easting)\n      y_raw: Y\
+  \ as printed (northing)\n      easting_m: easting EPSG:22183\n      northing_m:\
+  \ northing EPSG:22183\n      land_surface_elev_masl: land surface (collar) elevation,\
+  \ masl; empty for NA\n      land_surface_elev_raw: elevation text as printed\n \
+  \     year_constructed: year the well was built\n      total_depth_m: total depth,\
+  \ m below land surface\n      screen_top_m_bls: screen top, m below land surface\n\
+  \      screen_bottom_m_bls: screen bottom, m below land surface\n      hsu_raw:\
+  \ hydrostratigraphic unit text as printed\n      fuente_z_raw: report note on how\
+  \ coordinates/elevation were obtained, chosen by year_constructed\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

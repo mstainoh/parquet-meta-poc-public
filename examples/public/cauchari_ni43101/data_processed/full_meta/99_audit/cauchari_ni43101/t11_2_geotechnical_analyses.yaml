@@ -1,0 +1,22 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t11_2_geotechnical_analyses.yaml
+source_sha256: 3fa0dd7aad1543bf51cc5fef25e1f1316733b714989e5e122b2b7ec6f9f864df
+git_commit: null
+written_at: '2026-10-26 12:00:18.286141'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - analysis\n    not_nulls:\n    -\
+  \ analysis\n    foreign_keys: []\n  semantics:\n    description: >-\n      Geotechnical\
+  \ property analyses run on the core and the procedure (standard) used for each.\
+  \ Source:\n      NI 43-101 technical report on the Cauchari-Olaroz operation (effective\
+  \ Jan 8 2025), Table 11.2 (printed\n      p.182, PDF p.198).\n    grain: one row\
+  \ per analysis\n    caveats: Text table (method catalogue, no results).\n    temporal_scope:\
+  \ static\n    cross_tables: []\n    column_info:\n      tabla: report table number\
+  \ the row was extracted from\n      pag_impresa: printed page of the report where\
+  \ the row is\n      pag_pdf: PDF page of the row (printed page + 16)\n      nota:\
+  \ >-\n        free-text flag written at extraction (source typo, outlier, reconstructed\
+  \ row, cross-check result);\n        empty = nothing to flag\n      analysis: property\
+  \ analysed\n      procedure: standard or procedure used\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

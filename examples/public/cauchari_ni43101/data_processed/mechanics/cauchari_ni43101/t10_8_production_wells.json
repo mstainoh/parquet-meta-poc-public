@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.904041",
+  "row_count": 38,
+  "file_columns": [
+    "tabla",
+    "pag_impresa",
+    "pag_pdf",
+    "pumping_well",
+    "year",
+    "total_depth_m",
+    "x_raw",
+    "y_raw",
+    "easting",
+    "northing",
+    "drilling_method",
+    "drilling_diameter_inches",
+    "total_length_casing_inserted_m",
+    "total_length_screen_casing_inserted_m",
+    "solid_casing",
+    "screen_casing",
+    "nota",
+    "xy_swapped"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "pag_impresa": "int64",
+    "pag_pdf": "int64",
+    "pumping_well": "str",
+    "year": "int64",
+    "total_depth_m": "float64",
+    "x_raw": "str",
+    "y_raw": "str",
+    "easting": "float64",
+    "northing": "float64",
+    "drilling_method": "str",
+    "drilling_diameter_inches": "str",
+    "total_length_casing_inserted_m": "str",
+    "total_length_screen_casing_inserted_m": "str",
+    "solid_casing": "str",
+    "screen_casing": "str",
+    "nota": "str",
+    "xy_swapped": "bool"
+  },
+  "null_count": {
+    "tabla": 0,
+    "pag_impresa": 0,
+    "pag_pdf": 0,
+    "pumping_well": 0,
+    "year": 0,
+    "total_depth_m": 0,
+    "x_raw": 0,
+    "y_raw": 0,
+    "easting": 0,
+    "northing": 0,
+    "drilling_method": 0,
+    "drilling_diameter_inches": 0,
+    "total_length_casing_inserted_m": 0,
+    "total_length_screen_casing_inserted_m": 0,
+    "solid_casing": 0,
+    "screen_casing": 0,
+    "nota": 0,
+    "xy_swapped": 0
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "pag_impresa": 5,
+    "pag_pdf": 5,
+    "pumping_well": 38,
+    "year": 6,
+    "total_depth_m": 36,
+    "x_raw": 37,
+    "y_raw": 36,
+    "easting": 36,
+    "northing": 37,
+    "drilling_method": 1,
+    "drilling_diameter_inches": 38,
+    "total_length_casing_inserted_m": 37,
+    "total_length_screen_casing_inserted_m": 37,
+    "solid_casing": 1,
+    "screen_casing": 2,
+    "nota": 22,
+    "xy_swapped": 1
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 162,
+      "max": 166
+    },
+    "pag_pdf": {
+      "min": 178,
+      "max": 182
+    },
+    "year": {
+      "min": 2011,
+      "max": 2023
+    },
+    "total_depth_m": {
+      "min": 201.0,
+      "max": 715.0
+    },
+    "easting": {
+      "min": 3419086.0,
+      "max": 3428517.0
+    },
+    "northing": {
+      "min": 7375500.0,
+      "max": 7399263.0
+    },
+    "xy_swapped": {
+      "min": true,
+      "max": true
+    }
+  },
+  "file_size_bytes": 30672,
+  "file_index_columns": [],
+  "file_uniques": [
+    "pumping_well",
+    "drilling_diameter_inches"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [
+    {
+      "source_col": "pumping_well",
+      "target_table": "wells",
+      "target_col": "pozo_id",
+      "orphans": []
+    }
+  ],
+  "fk_verified": true
+}

@@ -1,0 +1,27 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t10_2_rc_brine_sample_counts.yaml
+source_sha256: ee06151758db5c3dc052397bb5f9208d81e72f7c4b8b6eccd98cb3b48e7f36b6
+git_commit: null
+written_at: '2026-10-26 12:00:18.095965'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - description\n    not_nulls:\n  \
+  \  - description\n    foreign_keys: []\n  semantics:\n    description: >-\n    \
+  \  Counts of brine samples collected and submitted for laboratory analysis, by sample\
+  \ type. Source:\n      NI 43-101 technical report on the Cauchari-Olaroz operation\
+  \ (effective Jan 8 2025), Table 10.2 (printed\n      p.148, PDF p.164).\n    grain:\
+  \ one row per sample category as printed (includes subtotal and total rows)\n  \
+  \  caveats: >-\n      Rows mix categories and their totals (e.g. 'Total Field Samples');\
+  \ do not sum the column across\n      rows. The counts cover only the 2009-2010\
+  \ programs (RC and DDH) and include holes with no row in\n      the chemistry tables.\
+  \ Commas in the source are thousands separators.\n    temporal_scope: campaign_window\n\
+  \    cross_tables:\n    - t10_3_rc_brine_chemistry\n    column_info:\n      tabla:\
+  \ report table number the row was extracted from\n      pag_impresa: printed page\
+  \ of the report where the row is\n      pag_pdf: PDF page of the row (printed page\
+  \ + 16)\n      nota: >-\n        free-text flag written at extraction (source typo,\
+  \ outlier, reconstructed row, cross-check result);\n        empty = nothing to flag\n\
+  \      description: sample category as printed, including subtotal/total rows\n\
+  \      brine_samples: number of brine samples\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

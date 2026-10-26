@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parquet-meta-contract"
+version = "0.3.0"
+description = "Metadata contract and tools (meta_tools) to stamp, validate and verify Parquet table metadata, and to build the artifacts an AI agent reads to write SQL over the tables."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{name = "Marcelo Stainoh"}]
+# SPDX expression + license-files (PEP 639): the TOML-table form is deprecated in
+# setuptools and stops building after its deprecation date.
+license = "MIT"
+license-files = ["LICENSE"]
+# pydantic was dropped in ADR-005: validation compares dicts, it builds no models.
+dependencies = [
+    "pyyaml>=6",
+    "pandas>=2",
+    "pyarrow>=15",
+]
+
+[project.optional-dependencies]
+# Includes python-dotenv: needed by the scripts under scripts/ that read
+# .env (run_metadata_etl.py, or an integration's own scripts; standalone
+# scripts, not part of the package) via scripts/project_env.py.
+dev = [
+    "pytest>=8",
+    "python-dotenv>=1",
+]
+# --- src layout: the only installable/importable package is meta_tools ---
+# scripts/ stays out by structure, not by configuration: what lives there
+# is run (`python scripts/run_metadata_etl.py`), not imported.
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["meta_tools", "meta_tools.check", "meta_tools.write"]
+
+# The contract is package data: check/contract.py loads it from the package
+# root (one level above check/), so it has to ship with the install.
+[tool.setuptools.package-data]
+meta_tools = ["*.yaml"]
+
+[project.urls]
+Repository = "https://github.com/mstainoh/parquet-meta-poc-public"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

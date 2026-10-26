@@ -1,0 +1,94 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 49
+observed_by: claude
+findings:
+- columns:
+  - x_coordinate_m
+  - y_coordinate_m
+  - borehole_id
+  - piezometer_id
+  severity: data_error
+  note: >-
+    Text p.152/PDF 168: "Shallow and intermediate depth boreholes were completed in the same borehole ... The deeper
+    borehole was drilled 15 m away from the shallow and intermediate well locations". The 14th site breaks both
+    rules (values checked on the image of PDF 171). SL-014 (RC17S-014) has the exact coordinates of DL-014 (DD17D-014),
+    3426361/7387640, which is 0 m from the deep hole. ML-014, in the same borehole RC17S-014, sits 21 m away at
+    3426381/7387647. ML-014 is the one that fits the 15 m rule. So SL-014's XY, which Table 15.3 repeats, or DL-014's
+    XY is probably a copy error. The text points to SL-014 and/or DL-014 as suspect, not ML-014.
+- columns:
+  - x_coordinate_m
+  - y_coordinate_m
+  - piezometer_id
+  severity: note
+  note: >-
+    The "15 m away" of the text (p.152) is nominal. The measured deep-to-shallow offsets per site are 8.6 (002),
+    14-15 (003), 8.6-19.2 (004), 69.3 (005), 25.8 (006), 12.7 (007), 19.0 (008), 18.4 (009), 19.2 (010), 20.6 (011),
+    12.2 (012), 13.0 (013), 16.6 (001) and 0 (014, see the finding above). Site 005 (DL-005 vs ML-005, 69 m) is
+    far off the stated design and worth checking.
+- columns:
+  - screen_diameter_in
+  - piezometer_id
+  severity: data_error
+  note: >-
+    Text p.152/PDF 168: "The shallowest wells use 1" diameter PVC casing ... The intermediate and deep wells were
+    cased using Schedule 80, 2-inch or 2.5-inch diameter, PVC casing". The table (checked on the image) contradicts
+    it for SL-009 (2"), SL-010 (2"), SL-004B (2.5") and DL-012 (3"). A filter such as "1-inch shallow piezometers"
+    or "diameter IN (2, 2.5)" gives a different set depending on whether you trust the text or the table.
+- columns:
+  - total_depth_m
+  - piezometer_id
+  severity: note
+  note: >-
+    Text p.152: the 2017-2019 programs drilled "50 m, 200 m and 450 to 600 m deep" wells per platform (SL / ML /
+    DL). These are nominal depths. The table has SL-014 at 26.7 m (screen base = total depth). ML-008 is 160, ML-002
+    189.1 and ML-005 192. DL-003 and DL-004 are 650, DL-003B 648, DL-005 604.55, DL-014 431.35 and DL-008 447. The
+    DD18D holes are 300 m (DD18D-003 13 m, abandoned) and DD19D-001 is 632 m. Use total_depth_m, not the SL/ML/DL
+    class, for depth.
+- columns:
+  - platform_raw
+  severity: note
+  note: >-
+    Meaning of "Plataform": text p.152-153/PDF 168-169 says the programs drilled the 50/200/450-600 m wells "from
+    the same drilling platform". Figure 10.2 is "Borehole Locations and Associated Drilling Platforms". So platform_raw
+    is the drill-pad number(s) of Figure 10.2 grouping SL/ML/DL of one site. Multi-values such as "3 13 14" are
+    pad numbers as drawn there. The figure is a map, not extracted, and the text does not explain the multiple numbers.
+    The DD18D codes (CN-10, CN-14, CN-19, CN-02, CS-28, CS-31, P-17) follow another scheme; several of those holes
+    share XY with production wells (well_aliases). "PE-09" for DD19D-PE09 means it was drilled on the pad of RC
+    hole PE-09.
+- columns:
+  - contractor
+  - borehole_id
+  severity: note
+  note: >-
+    Text p.153/PDF 169 names only Major Drilling and Ideal Drilling for this program, and section 11.3 (p.176/PDF
+    192) says diamond drilling was by Major Drilling and Ideal Drilling. Section 11.2 (p.175/PDF 191) names Hidrotec
+    (with Wichi Toledo) as the ROTARY contractor for pumping wells. DD19D-001 and DD19D-PE09 list Hidrotec, which
+    the text does not account for. Text p.153 also says deep holes were HQ triple-tube cored and shallow/medium
+    holes rotary tricone 5 7/8". RC17D-003 (DL-003B) and RC17D-004B (DL-004B) are deep holes with an RC prefix,
+    so their drilling method is unclear.
+- columns:
+  - screen_top_mbtw
+  - screen_base_mbtw
+  - total_depth_m
+  severity: note
+  note: >-
+    Table note p.155/PDF 171: "mbtw = metres below top of well", i.e. measured from the top of casing, not ground
+    level. total_depth_m and the Table 10.7 interval depths have no stated reference, and no stick-up is given.
+    Expect offsets of the order of the casing stick-up when comparing screen depths with total depth or chemistry
+    depths. 33 RBRC samples were taken from DD19D-PE09 in 2019 (text p.175 and p.181), the only geotechnical data
+    for this program. RBRC was not measured in 2017-2018.
+- columns:
+  - platform_raw
+  - piezometer_id
+  - borehole_id
+  severity: note
+  note: >-
+    Figure 10.2 'Borehole Locations and Associated Drilling Platforms' (p.157/PDF 173; raster map, labels read visually)
+    labels each 2017 platform with its piezometers and, on some, a production well: 01 = DL-001, ML-001, SL-001,
+    W-01; 02 = DL-004B, ML-004, SL-004,B; 04 = DL-002B, ML-002, SL-002, W-02; 05 = DL-010, ML-010B, SL-010; 06 =
+    DL-008, ML-008; 07 = DL-005, ML-005, W-05; 08-15 = DL-007, ML-007, SL-007, W-07; 09 = DL-003 B, ML-003; 10 =
+    DL-012, ML-012; 11-12 = DL/ML/SL-009; 16 = DL-011, ML-011; 17-20 = DL/ML/SL-014; 18 = DL/ML/SL-013; 03-13-14
+    = DL-006B, ML-006, SL-006, W17-06. The numbers match platform_raw. Piezometers with the same number are co-located
+    (SL/ML same XY, DL 8.6-69 m away). Hypothesis, NOT applied to any value: the W listed on a platform shares the
+    pad with those piezometers (see t10_8_production_wells inspect for the coordinate check).

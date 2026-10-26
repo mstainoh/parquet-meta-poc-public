@@ -1,0 +1,50 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 63
+observed_by: claude
+findings:
+- columns:
+  - h3bo3_mg_l
+  severity: note
+  note: >-
+    Boron is reported as boric acid (H3BO3), whereas Tables 10.3 and 10.5 report elemental B. Section 11.6.1 (text
+    p.180/PDF 196) lists boron among the ICP elements at ASA; the internal Exar lab method list has no boron. To
+    compare with b_mg_l of t10_3/t10_5, convert B = H3BO3 x 10.81/61.83 (x 0.1748). Here that gives B of about 431-2,058
+    mg/L, against 655-1,398 (10.3) and 610-872 (10.5). Comparing h3bo3_mg_l with b_mg_l directly overstates boron
+    by a factor of 5.7.
+- columns:
+  - from_m
+  - to_m
+  - piezometer_name
+  - borehole_id
+  severity: note
+  note: >-
+    The intervals are not the piezometer screen. Every DL series starts at 0 m, while the DL screens in Table 10.6
+    start at 197-343 m. DL-011 (0-200) and DL-013 (0-260) lie entirely above their screens (235.8-444 and 279.18-443).
+    DD19D-001 (450-632) has no piezometer or screen at all. Text p.152/PDF 168 lists "brine samples using a bailer"
+    among the drilling objectives, and section 11.5.1 (p.178/PDF 194) describes bailer samples "at 20 m intervals".
+    These are borehole depth profiles (likely sampled during drilling) averaged over 15-250 m. Do not read them
+    as the brine that the named piezometer's screen produces, and do not join them to 10.6 screens to infer "screen
+    chemistry".
+- columns:
+  - li_mg_l
+  - k_mg_l
+  - mg_mg_l
+  - h3bo3_mg_l
+  - so4_mg_l
+  severity: note
+  note: >-
+    Lab and method are not identified per row (section 11.5/11.6.1, text p.178-180). The 2017-2019 brine went to
+    ASA in Jujuy (ICP after 100:1 dilution; gravimetric SO4) or to the internal Exar lab (AA for Li and K; titration
+    for Mg; gravimetric SO4). The Exar lab "is not a certified laboratory"; the text says "The Company" was ISO
+    9001 certified in 2023, expired in 2024 (p.181). Samples were not filtered (p.178). Mg by titration and Mg by
+    ICP can differ, so treat Mg/Li comparisons across rows and tables with care. No QC counts are given for this
+    program in sections 10-11 (QA/QC deferred to Section 12, not audited).
+- columns:
+  - piezometer_id
+  - mg_mg_l
+  - li_mg_l
+  severity: note
+  note: >-
+    DL-001 intervals 300-400 and 400-450 m repeat exactly the same Mg (1230.1 mg/L) with different Li: possible
+    copy error in the source. Kept as printed.

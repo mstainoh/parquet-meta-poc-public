@@ -1,0 +1,28 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t16_1_infill_wells_2024.yaml
+source_sha256: 51b18deaaaf357de4c77573baf8382660345870a7216395ab8f1dbb99a4c8e7e
+git_commit: null
+written_at: '2026-10-26 12:00:18.324862'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - borehole_id\n    not_nulls:\n  \
+  \  - borehole_id\n    foreign_keys:\n    - source_col: pozo_id\n      target_table:\
+  \ wells\n      target_col: pozo_id\n  semantics:\n    description: >-\n      Infill\
+  \ production wells 44, 45 and 46 (2024) with platform, contractor, stage and coordinates.\
+  \ Source:\n      NI 43-101 technical report on the Cauchari-Olaroz operation (effective\
+  \ Jan 8 2025), Table 16.1 (printed\n      p.283, PDF p.299).\n    grain: one row\
+  \ per infill well\n    caveats: >-\n      Stage is a snapshot at report date. The\
+  \ table says location 'Olaroz'. Wells 44-46 are not in Appendix\n      2.\n    temporal_scope:\
+  \ current_state\n    cross_tables:\n    - wells\n    column_info:\n      tabla:\
+  \ report table number the row was extracted from\n      pag_impresa: printed page\
+  \ of the report where the row is\n      pag_pdf: PDF page of the row (printed page\
+  \ + 16)\n      nota: >-\n        free-text flag written at extraction (source typo,\
+  \ outlier, reconstructed row, cross-check result);\n        empty = nothing to flag\n\
+  \      borehole_id: well label as printed ('Pozo 44')\n      pozo_id: canonical\
+  \ id POZO-nn; joins `wells.pozo_id`\n      platform: drill platform id\n      stage:\
+  \ construction stage as printed\n      x_raw: X as printed (easting)\n      y_raw:\
+  \ Y as printed (northing)\n      easting_m: easting EPSG:22183\n      northing_m:\
+  \ northing EPSG:22183\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

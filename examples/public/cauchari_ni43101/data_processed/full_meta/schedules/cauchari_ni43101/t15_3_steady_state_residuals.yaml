@@ -1,0 +1,63 @@
+schema_version: null
+keys:
+  uniques:
+  - well_id
+  not_nulls:
+  - well_id
+  foreign_keys:
+  - source_col: pozo_id
+    target_table: wells
+    target_col: pozo_id
+semantics:
+  description: 'Steady-state model calibration: observed vs computed groundwater elevation
+    at 27 monitoring locations, with XY. Source: NI 43-101 technical report on the
+    Cauchari-Olaroz operation (effective Jan 8 2025), Table 15.3 (printed p.266-267,
+    PDF p.282-283).'
+  grain: one row per monitoring location
+  caveats: 'Elevations are masl (groundwater ELEVATION), not depth to water. DDH-17
+    is a flowing well far south of the other points (footnote *): its observed value
+    is a censored model target; kept and flagged. SL-xx are piezometers: pozo_id maps
+    them to their borehole. Levels are of 2018, pre-development conditions, mostly
+    in shallow wells, and are not corrected for brine density. CAU* rows come from
+    a third party (Adv. Lithium, 2018), not from the project. well_id is the id as
+    printed (SL-13 has 2 digits in the source). The ''Adv. Lithium, 2018'' source
+    cells are offset vertically from their rows in the PDF; assigned one-to-one in
+    order.'
+  temporal_scope: static
+  cross_tables:
+  - wells
+  column_info:
+    tabla: report table number the row was extracted from
+    pag_impresa: printed page of the report where the row is
+    pag_pdf: PDF page of the row (printed page + 16)
+    nota: free-text flag written at extraction (source typo, outlier, reconstructed
+      row, cross-check result); empty = nothing to flag
+    well_id: id as printed
+    pozo_id: canonical id; joins `wells.pozo_id` (SL-xxx -> its borehole, DDH-n ->
+      DDH-nn)
+    x_raw: X as printed (easting)
+    y_raw: Y as printed (northing)
+    easting_m: easting EPSG:22183
+    northing_m: northing EPSG:22183
+    observed_gw_elev_masl: observed groundwater elevation, masl
+    computed_gw_elev_masl: model groundwater elevation, masl
+    residual_m: observed - computed, m
+    residual_raw: residual text as printed (with asterisk)
+    source: who measured it
+inspect: null
+file_columns:
+- tabla
+- pag_impresa
+- pag_pdf
+- pozo_id
+- well_id
+- x_raw
+- y_raw
+- easting_m
+- northing_m
+- observed_gw_elev_masl
+- computed_gw_elev_masl
+- residual_m
+- residual_raw
+- source
+- nota

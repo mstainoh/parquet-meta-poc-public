@@ -1,0 +1,39 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t10_5_ddh_brine_chemistry.yaml
+source_sha256: ac559fc6affc9d45040bbeb9395c00867534cda3a360304e44d03522b5bf349a
+git_commit: null
+written_at: '2026-10-26 12:00:18.154791'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - well_id\n    - from_m\n    - to_m\n\
+  \    not_nulls:\n    - well_id\n    - from_m\n    - to_m\n    foreign_keys:\n  \
+  \  - source_col: well_id\n      target_table: t10_4_ddh_boreholes_2009_2010\n  \
+  \    target_col: well_id\n    - source_col: well_id\n      target_table: wells\n\
+  \      target_col: pozo_id\n  semantics:\n    description: >-\n      Brine chemistry\
+  \ averaged over depth intervals for DDH-01, 04, 06, 08, 12 and 13 (B, K, Li, Mg,\
+  \ SO4,\n      Mg/Li). Source: NI 43-101 technical report on the Cauchari-Olaroz\
+  \ operation (effective Jan 8 2025),\n      Table 10.5 (printed p.152, PDF p.168).\n\
+  \    grain: one row per DDH hole and depth interval - an interval average, not a\
+  \ point sample\n    caveats: >-\n      THIS table writes a point as THOUSANDS separator\
+  \ in K, Mg and SO4 (4.847 = 4847) while Mg/Li is\n      a true decimal (2.20); both\
+  \ were normalized to plain numbers (rule: d.ddd in K/Mg/SO4 -> thousands).\n   \
+  \   length_m differs from to_m - from_m in some rows exactly as printed and the\
+  \ report does not explain\n      it. The table has no K/Li or SO4/Li. Every row\
+  \ is already an average over an interval of very different\n      length: weight\
+  \ by interval length when averaging, and do not pool Tables 10.3, 10.5 and 10.7\
+  \ without\n      considering campaign, sampling method and laboratory.\n    temporal_scope:\
+  \ campaign_window\n    cross_tables:\n    - t10_4_ddh_boreholes_2009_2010\n    -\
+  \ wells\n    column_info:\n      tabla: report table number the row was extracted\
+  \ from\n      pag_impresa: printed page of the report where the row is\n      pag_pdf:\
+  \ PDF page of the row (printed page + 16)\n      nota: >-\n        free-text flag\
+  \ written at extraction (source typo, outlier, reconstructed row, cross-check result);\n\
+  \        empty = nothing to flag\n      well_id: DDH id as printed (already two\
+  \ digits); joins `wells.pozo_id`\n      from_m: interval top, m\n      to_m: interval\
+  \ bottom, m\n      length_m: interval length as printed\n      b_mg_l: boron, mg/L\n\
+  \      k_mg_l: potassium, mg/L (source uses '.' as thousands)\n      li_mg_l: lithium,\
+  \ mg/L\n      mg_mg_l: magnesium, mg/L\n      so4_mg_l: sulfate, mg/L (source uses\
+  \ '.' as thousands)\n      mg_li_orig: Mg/Li as printed (decimal)\n      mg_li_recalc:\
+  \ Mg/Li computed from mg_mg_l / li_mg_l\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

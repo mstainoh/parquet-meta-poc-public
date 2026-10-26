@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.889840",
+  "row_count": 111,
+  "file_columns": [
+    "tabla",
+    "pag_impresa",
+    "pag_pdf",
+    "pumping_well",
+    "interval_no",
+    "drilling_diameter_raw",
+    "bit_diameter_inches",
+    "from_m",
+    "to_m",
+    "nota"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "pag_impresa": "int64",
+    "pag_pdf": "int64",
+    "pumping_well": "str",
+    "interval_no": "int64",
+    "drilling_diameter_raw": "str",
+    "bit_diameter_inches": "float64",
+    "from_m": "float64",
+    "to_m": "float64",
+    "nota": "str"
+  },
+  "null_count": {
+    "tabla": 0,
+    "pag_impresa": 0,
+    "pag_pdf": 0,
+    "pumping_well": 0,
+    "interval_no": 0,
+    "drilling_diameter_raw": 0,
+    "bit_diameter_inches": 0,
+    "from_m": 0,
+    "to_m": 0,
+    "nota": 109
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "pag_impresa": 5,
+    "pag_pdf": 5,
+    "pumping_well": 38,
+    "interval_no": 4,
+    "drilling_diameter_raw": 103,
+    "bit_diameter_inches": 16,
+    "from_m": 59,
+    "to_m": 94,
+    "nota": 2
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 162,
+      "max": 166
+    },
+    "pag_pdf": {
+      "min": 178,
+      "max": 182
+    },
+    "interval_no": {
+      "min": 1,
+      "max": 4
+    },
+    "bit_diameter_inches": {
+      "min": 10.625,
+      "max": 27.0
+    },
+    "from_m": {
+      "min": 0.0,
+      "max": 645.4
+    },
+    "to_m": {
+      "min": 12.0,
+      "max": 715.0
+    }
+  },
+  "file_size_bytes": 18035,
+  "file_index_columns": [],
+  "file_uniques": [],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [
+    {
+      "source_col": "pumping_well",
+      "target_table": "t10_8_production_wells",
+      "target_col": "pumping_well",
+      "orphans": []
+    }
+  ],
+  "fk_verified": true
+}

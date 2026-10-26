@@ -1,0 +1,75 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 45
+observed_by: claude
+findings:
+- columns:
+  - well_id
+  - from_m
+  - to_m
+  severity: data_error
+  note: >-
+    The 3 rows labelled PE-14 (147-179, 179-192, 192-228 m; label checked on the image of PDF 165) lie below the
+    total depth of PE-14, which is 144 m in Table 10.1 (text p.147/PDF 163). They fall exactly inside the twin hole
+    PE-14A, drilled 144-228 m. They are almost certainly PE-14A chemistry printed under the PE-14 label. A query
+    by well_id (e.g. "chemistry of PE-14A" or "deepest sample of PE-14") returns the wrong hole. The rows were kept
+    as printed.
+- columns:
+  - length_m
+  - from_m
+  - to_m
+  severity: note
+  note: >-
+    Text p.147/PDF 163: "chip and brine samples are collected from the cyclone at one-metre intervals. Occasionally,
+    lost circulation resulted in the inability to collect samples from some intervals." This backs the caveat that
+    length_m < to_m - from_m means unsampled gaps. But SUM(length_m) = 1,643 m against the 1,487 RC samples of Table
+    10.2 (from 15 holes, PE-03 included). So length_m is not a count of 1 m samples. Treat it as a printed length,
+    not as a weight in sample counts.
+- columns:
+  - b_mg_l
+  - k_mg_l
+  - li_mg_l
+  - mg_mg_l
+  - so4_mg_l
+  severity: note
+  note: >-
+    Sampling and lab context (sections 10.1 and 11). The brines are air-lift samples from the RC cyclone taken while
+    drilling, not depth-isolated pumped samples; no drilling additives were used. Per section 11.5-11.6.1 (text
+    p.178-180/PDF 194-196), brine samples went to two labs. Alex Stewart Argentina (ASA, ISO 9001/14001) used ICP
+    after 100:1 dilution for Na, K, Li, Ca, Mg and B, and gravimetry for SO4. The internal Exar lab (not certified)
+    used AA for Li, Na and K, titration for Ca, Mg and Cl, and gravimetry for SO4. The table does not say which
+    lab produced which interval, and the 2009-2010 procedures are deferred to the 2017 Feasibility Study. QA/QC
+    is deferred to Section 12. Field K by portable XRF is not in this table.
+- columns:
+  - well_id
+  severity: note
+  note: >-
+    Text p.148/PDF 164: averages cover "14 of the 15 sampled RC boreholes". PE-3 (PE-03) was sampled but excluded
+    because it is a flowing artesian well that receives freshwater from the alluvial cone on the eastern margin
+    of the Olaroz salar. An absent PE-03 here means excluded, not unsampled.
+- columns:
+  - well_id
+  severity: note
+  note: >-
+    Figure 10.2 'Borehole Locations and Associated Drilling Platforms' (p.157/PDF 173; raster map, labels read visually)
+    groups some RC holes with PB pumping wells in one map label: PE-21 with PB-03A ('PB-03,A / PP-03B,C / PP-B-PB3
+    / PE-21 / PF-03A,B'), PE-20 with PB-01 ('DDH-10,B / PP-01A,B,C / PF-01A,B / PB-01 / PE-20'), PE-18 with PB-02
+    ('PE-18 / PP-PB2 / PB-02,A / PP-02A'). PB-01 and PB-03A have XY and Z in Appendix 1; PB-02 is in no extracted
+    table. Hypothesis only: these PE may share the PB location. No coordinate was assigned - easting/northing of
+    PE-18/20/21 stay NULL in `wells`.
+- columns:
+  - well_id
+  - mg_mg_l
+  - mg_li_orig
+  severity: note
+  note: >-
+    PE-10 interval 60-152 m prints Mg = 174 mg/L with Mg/Li = 0, far below every other interval (Mg in the thousands).
+    Kept as printed and flagged in `nota`: likely a source typo, not confirmed by any other table.
+- columns:
+  - well_id
+  - from_m
+  - to_m
+  severity: note
+  note: >-
+    The first 5 rows of PDF p.166 carry no borehole label in the source (the table continues from p.165, where the
+    last label is PE-17). They were assigned to PE-17 by continuation, since the next label is PE-18.

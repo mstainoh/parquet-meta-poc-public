@@ -1,0 +1,49 @@
+schema_version: null
+keys:
+  uniques:
+  - pumping_well
+  - interval_no
+  not_nulls:
+  - pumping_well
+  - interval_no
+  foreign_keys:
+  - source_col: pumping_well
+    target_table: t10_8_production_wells
+    target_col: pumping_well
+semantics:
+  description: 'Drilling intervals (bit diameter and depth range) of the production
+    wells, parsed from the multi-line cell of Table 10.8. Source: NI 43-101 technical
+    report on the Cauchari-Olaroz operation (effective Jan 8 2025), Table 10.8 (PDF
+    p.178-182).'
+  grain: one row per production well and drilling interval
+  caveats: Derived by splitting the 'drilling diameter' cell of Table 10.8; the casing
+    and screen cells were NOT aligned to intervals. In some wells the last interval
+    does not end at total_depth_m of the main table, and a few intervals do not start
+    where the previous one ends (see inspect of the main table).
+  temporal_scope: static
+  cross_tables:
+  - t10_8_production_wells
+  column_info:
+    tabla: report table number the row was extracted from
+    pag_impresa: printed page of the report where the row is
+    pag_pdf: PDF page of the row (printed page + 16)
+    nota: free-text flag written at extraction (source typo, outlier, reconstructed
+      row, cross-check result); empty = nothing to flag
+    pumping_well: well id; joins `t10_8_production_wells`
+    interval_no: order of the interval inside the cell, from 1
+    drilling_diameter_raw: text of the interval as printed
+    bit_diameter_inches: bit diameter in inches as decimal
+    from_m: start depth, m
+    to_m: end depth, m
+inspect: null
+file_columns:
+- tabla
+- pag_impresa
+- pag_pdf
+- pumping_well
+- interval_no
+- drilling_diameter_raw
+- bit_diameter_inches
+- from_m
+- to_m
+- nota

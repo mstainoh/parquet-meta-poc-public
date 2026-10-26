@@ -1,0 +1,159 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.864784",
+  "row_count": 63,
+  "file_columns": [
+    "tabla",
+    "pag_impresa",
+    "pag_pdf",
+    "piezometer_name",
+    "interval_raw",
+    "from_m",
+    "to_m",
+    "length_m",
+    "li_mg_l",
+    "k_mg_l",
+    "mg_mg_l",
+    "h3bo3_mg_l",
+    "so4_mg_l",
+    "mg_li_orig",
+    "mg_li_recalc",
+    "nota",
+    "piezometer_id",
+    "borehole_id"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "pag_impresa": "int64",
+    "pag_pdf": "int64",
+    "piezometer_name": "str",
+    "interval_raw": "str",
+    "from_m": "float64",
+    "to_m": "float64",
+    "length_m": "float64",
+    "li_mg_l": "float64",
+    "k_mg_l": "float64",
+    "mg_mg_l": "float64",
+    "h3bo3_mg_l": "float64",
+    "so4_mg_l": "float64",
+    "mg_li_orig": "float64",
+    "mg_li_recalc": "float64",
+    "nota": "str",
+    "piezometer_id": "str",
+    "borehole_id": "str"
+  },
+  "null_count": {
+    "tabla": 0,
+    "pag_impresa": 0,
+    "pag_pdf": 0,
+    "piezometer_name": 0,
+    "interval_raw": 0,
+    "from_m": 0,
+    "to_m": 0,
+    "length_m": 0,
+    "li_mg_l": 0,
+    "k_mg_l": 0,
+    "mg_mg_l": 0,
+    "h3bo3_mg_l": 0,
+    "so4_mg_l": 0,
+    "mg_li_orig": 0,
+    "mg_li_recalc": 0,
+    "nota": 42,
+    "piezometer_id": 0,
+    "borehole_id": 0
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "pag_impresa": 3,
+    "pag_pdf": 3,
+    "piezometer_name": 18,
+    "interval_raw": 23,
+    "from_m": 13,
+    "to_m": 18,
+    "length_m": 11,
+    "li_mg_l": 62,
+    "k_mg_l": 62,
+    "mg_mg_l": 61,
+    "h3bo3_mg_l": 63,
+    "so4_mg_l": 63,
+    "mg_li_orig": 24,
+    "mg_li_recalc": 56,
+    "nota": 1,
+    "piezometer_id": 18,
+    "borehole_id": 18
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 158,
+      "max": 160
+    },
+    "pag_pdf": {
+      "min": 174,
+      "max": 176
+    },
+    "from_m": {
+      "min": 0.0,
+      "max": 500.0
+    },
+    "to_m": {
+      "min": 19.0,
+      "max": 632.0
+    },
+    "length_m": {
+      "min": 15.0,
+      "max": 250.0
+    },
+    "li_mg_l": {
+      "min": 237.0,
+      "max": 807.2
+    },
+    "k_mg_l": {
+      "min": 1968.0,
+      "max": 7422.0
+    },
+    "mg_mg_l": {
+      "min": 422.6,
+      "max": 2067.0
+    },
+    "h3bo3_mg_l": {
+      "min": 2468.0,
+      "max": 11771.7
+    },
+    "so4_mg_l": {
+      "min": 9528.0,
+      "max": 54743.3
+    },
+    "mg_li_orig": {
+      "min": 0.9,
+      "max": 4.9
+    },
+    "mg_li_recalc": {
+      "min": 0.92,
+      "max": 4.95
+    }
+  },
+  "file_size_bytes": 28191,
+  "file_index_columns": [],
+  "file_uniques": [
+    "h3bo3_mg_l",
+    "so4_mg_l"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [
+    {
+      "source_col": "piezometer_id",
+      "target_table": "t10_6_piezometers",
+      "target_col": "piezometer_id",
+      "orphans": []
+    },
+    {
+      "source_col": "borehole_id",
+      "target_table": "wells",
+      "target_col": "pozo_id",
+      "orphans": []
+    }
+  ],
+  "fk_verified": true
+}

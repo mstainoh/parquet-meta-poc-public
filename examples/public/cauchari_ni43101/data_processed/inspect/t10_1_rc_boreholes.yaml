@@ -1,0 +1,31 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 24
+observed_by: claude
+findings:
+  - columns: [well_id, to_m, length_m]
+    severity: note
+    note: >-
+      Text p.147/PDF 163 confirms the table: "Twenty-four RC boreholes (PE-01 through PE-22, plus two
+      twin holes) ... total drilling of 4,176 m. Borehole depths range from 28 m (PE-01) to 371 m (PE-10)".
+      The text's "depth" is to_m, not length_m: for PE-07 (78.9-249) and PE-14A (144-228) length_m is
+      metres drilled, not hole depth. Use to_m for depth questions and SUM(length_m) only for metres drilled.
+  - columns: [well_id, from_m, to_m]
+    severity: note
+    note: >-
+      PE-14A is the twin of PE-14 and was drilled from 144 m (the bottom of PE-14) to 228 m, i.e. it is
+      the deepening of the same site. The Table 10.3 chemistry printed under "PE-14" (147-179, 179-192,
+      192-228 m) lies entirely below PE-14's 144 m and inside PE-14A's 144-228 m (see the
+      t10_3_rc_brine_chemistry sidecar). Joining chemistry to this table by well_id attaches those
+      intervals to the wrong hole.
+  - columns: [well_id]
+    severity: note
+    note: >-
+      Text p.147-148/PDF 163-164: 1,487 brine samples were collected from 15 of the 24 RC holes; Table 10.3
+      shows 14 of them because PE-3 (PE-03) "a flowing artesian well" receiving freshwater from the
+      alluvial cone on the eastern margin of the Olaroz salar was left out. So 9 holes have no brine
+      chemistry: PE-01, 02, 05, 08, 11, 12, 16, 17A and one of PE-14/PE-14A. Brine and chip samples were
+      taken from the cyclone at one-metre intervals; field K (portable XRF, irregular), EC, pH and
+      temperature were measured but are in no table. Air-lift flows (6 holes) and daily static water levels
+      measured inside the drill string are not tabulated either. No drilling additives were used (ODEX /
+      open-hole RC, then tri-cone bits), Major Drilling with a Schramm T685W rig.

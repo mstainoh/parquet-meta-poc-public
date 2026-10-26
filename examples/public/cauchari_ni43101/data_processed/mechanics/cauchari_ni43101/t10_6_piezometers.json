@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.849613",
+  "row_count": 49,
+  "file_columns": [
+    "tabla",
+    "pag_impresa",
+    "pag_pdf",
+    "borehole_id",
+    "piezometer_id",
+    "status",
+    "dd_borehole_id",
+    "piezometer_name",
+    "screen_diameter_in",
+    "platform_raw",
+    "contractor",
+    "total_depth_m",
+    "screen_top_mbtw",
+    "screen_base_mbtw",
+    "x_coordinate_m",
+    "y_coordinate_m",
+    "nota"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "pag_impresa": "int64",
+    "pag_pdf": "int64",
+    "borehole_id": "str",
+    "piezometer_id": "str",
+    "status": "str",
+    "dd_borehole_id": "str",
+    "piezometer_name": "str",
+    "screen_diameter_in": "float64",
+    "platform_raw": "str",
+    "contractor": "str",
+    "total_depth_m": "float64",
+    "screen_top_mbtw": "float64",
+    "screen_base_mbtw": "float64",
+    "x_coordinate_m": "float64",
+    "y_coordinate_m": "float64",
+    "nota": "str"
+  },
+  "null_count": {
+    "tabla": 0,
+    "pag_impresa": 0,
+    "pag_pdf": 0,
+    "borehole_id": 0,
+    "piezometer_id": 7,
+    "status": 42,
+    "dd_borehole_id": 0,
+    "piezometer_name": 0,
+    "screen_diameter_in": 1,
+    "platform_raw": 0,
+    "contractor": 0,
+    "total_depth_m": 0,
+    "screen_top_mbtw": 8,
+    "screen_base_mbtw": 8,
+    "x_coordinate_m": 0,
+    "y_coordinate_m": 0,
+    "nota": 38
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "pag_impresa": 2,
+    "pag_pdf": 2,
+    "borehole_id": 40,
+    "piezometer_id": 42,
+    "status": 2,
+    "dd_borehole_id": 40,
+    "piezometer_name": 44,
+    "screen_diameter_in": 4,
+    "platform_raw": 22,
+    "contractor": 3,
+    "total_depth_m": 18,
+    "screen_top_mbtw": 33,
+    "screen_base_mbtw": 31,
+    "x_coordinate_m": 40,
+    "y_coordinate_m": 37,
+    "nota": 6
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 154,
+      "max": 155
+    },
+    "pag_pdf": {
+      "min": 170,
+      "max": 171
+    },
+    "screen_diameter_in": {
+      "min": 1.0,
+      "max": 3.0
+    },
+    "total_depth_m": {
+      "min": 13.0,
+      "max": 650.0
+    },
+    "screen_top_mbtw": {
+      "min": 2.9,
+      "max": 427.68
+    },
+    "screen_base_mbtw": {
+      "min": 26.7,
+      "max": 642.0
+    },
+    "x_coordinate_m": {
+      "min": 3419473.0,
+      "max": 3433260.0
+    },
+    "y_coordinate_m": {
+      "min": 7374367.0,
+      "max": 7411065.0
+    }
+  },
+  "file_size_bytes": 28554,
+  "file_index_columns": [],
+  "file_uniques": [],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [
+    {
+      "source_col": "borehole_id",
+      "target_table": "wells",
+      "target_col": "pozo_id",
+      "orphans": []
+    }
+  ],
+  "fk_verified": true
+}

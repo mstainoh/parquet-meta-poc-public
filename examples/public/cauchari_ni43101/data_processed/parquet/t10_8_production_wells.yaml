@@ -1,0 +1,53 @@
+meta:
+  keys:
+    uniques:
+    - pumping_well
+    not_nulls:
+    - pumping_well
+    foreign_keys:
+    - source_col: pumping_well
+      target_table: wells
+      target_col: pozo_id
+  semantics:
+    description: >-
+      Production wells: year, depth, coordinates, drilling method and casing/screen construction. Source:
+      NI 43-101 technical report on the Cauchari-Olaroz operation (effective Jan 8 2025), Table 10.8 (printed
+      p.162-167, PDF p.178-182).
+    grain: one row per production well
+    caveats: >-
+      X AND Y ARE SWAPPED in the source for all rows (column X holds the northing). easting/northing were
+      assigned by magnitude (x_raw/y_raw keep the printed values) - use easting/northing, never x_raw/y_raw.
+      W-16 easting was corrected from 3227420 to 3427420 following Appendix 2 Table 4 (same northing).
+      Several wells disagree with Appendix 1 or Appendix 2 coordinates: see `wells.xy_conflicto` and inspect.
+      Depth and coordinate errors found against other tables are in inspect, not corrected. Multi-line
+      cells (drilling_diameter_inches, casing and screen lengths) are raw text with ' | ' between lines,
+      not numbers; the bit diameters per interval are parsed in the intervals table. WR-10 spans a page
+      break (kept as one row).
+    temporal_scope: static
+    cross_tables:
+    - t10_8_production_well_intervals
+    - tA2_4_production_well_model
+    - wells
+    column_info:
+      tabla: report table number the row was extracted from
+      pag_impresa: printed page of the report where the row is
+      pag_pdf: PDF page of the row (printed page + 16)
+      nota: >-
+        free-text flag written at extraction (source typo, outlier, reconstructed row, cross-check result);
+        empty = nothing to flag
+      pumping_well: well id as printed; joins `wells.pozo_id`
+      year: year drilled
+      total_depth_m: total depth, m
+      x_raw: '''X'' column as printed - actually NORTHING'
+      y_raw: '''Y'' column as printed - actually EASTING'
+      easting: easting in EPSG:22183 (from y_raw, W-16 corrected)
+      northing: northing in EPSG:22183 (from x_raw)
+      drilling_method: drilling method as printed
+      drilling_diameter_inches: raw multi-line text of bit diameters and ranges
+      total_length_casing_inserted_m: raw text of casing sizes and lengths
+      total_length_screen_casing_inserted_m: >-
+        raw text of screen sizes and lengths; each length is the sum of several screen sections alternating
+        with solid casing
+      solid_casing: solid casing material
+      screen_casing: screen casing material
+      xy_swapped: true when x/y were swapped by this cleaning (all rows)

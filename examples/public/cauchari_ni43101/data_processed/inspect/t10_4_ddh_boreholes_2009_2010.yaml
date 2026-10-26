@@ -1,0 +1,28 @@
+schema_version: 1
+observed_at: 2026-10-25
+observed_row_count: 29
+observed_by: claude
+findings:
+  - columns: [to_m, well_id]
+    severity: note
+    note: >-
+      Text p.151/PDF 167: "Borehole depths range from 79 m (DDH-2) to 449.5 m (DDH-7)". The table (checked
+      on the page image) has shallower holes: DDH-13A, 13B, 13C and 13D at 20.5 m and DDH-10B at 36.8 m.
+      The text range is wrong, or it ignores the short twins. csv/raw/EXTRACTION_NOTES.md (batch 10.1/10.2/10.4) says
+      the range "coincide con el texto", which is not correct. MIN(to_m) = 20.5 is right for the data; do not
+      quote 79 m as the minimum.
+  - columns: [well_id]
+    severity: note
+    note: >-
+      Text p.151: "Twenty-nine boreholes (DDH-1 through DDH-18, plus twin holes)": 18 main holes + 11 twins
+      (4A, 6A, 8A, 9A, 10A, 10B, 12A, 13A-D) = 29, which matches the rows. Twins are separate holes at the
+      same site. DDH-06 is 129 m deep while its twin DDH-06A is 338.5 m. Table 10.5 prints DDH-06
+      chemistry down to 190 m (see the t10_5_ddh_brine_chemistry sidecar), so that chemistry probably
+      comes from DDH-06A. Major Drilling, Major-50 rig, triple-tube PQ/HQ core.
+  - columns: [well_id]
+    severity: note
+    note: >-
+      The undisturbed core sample counts in the text disagree. Text p.151/PDF 167 says "A total of 832
+      undisturbed samples were tested". Section 11.3 (text p.176/PDF 192) says 1,244 undisturbed samples
+      were collected from DDH-1 through DDH-18, with RBRC on 865, particle size on 58 and dry bulk density
+      on 36. 865 RBRC is more than 832 tested. Neither figure is in any table.

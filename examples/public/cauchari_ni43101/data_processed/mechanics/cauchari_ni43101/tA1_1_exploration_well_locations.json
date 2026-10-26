@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "scanned_at": "2026-10-26 12:09:22.975550",
+  "row_count": 12,
+  "file_columns": [
+    "tabla",
+    "pag_impresa",
+    "pag_pdf",
+    "pozo_id",
+    "well_id",
+    "x_raw",
+    "y_raw",
+    "easting_m",
+    "northing_m",
+    "land_surface_elev_masl",
+    "land_surface_elev_raw",
+    "year_constructed",
+    "total_depth_m",
+    "screen_top_m_bls",
+    "screen_bottom_m_bls",
+    "hsu_raw",
+    "fuente_z_raw",
+    "nota"
+  ],
+  "dtypes": {
+    "tabla": "str",
+    "pag_impresa": "int64",
+    "pag_pdf": "int64",
+    "pozo_id": "str",
+    "well_id": "str",
+    "x_raw": "str",
+    "y_raw": "str",
+    "easting_m": "float64",
+    "northing_m": "float64",
+    "land_surface_elev_masl": "float64",
+    "land_surface_elev_raw": "str",
+    "year_constructed": "int64",
+    "total_depth_m": "float64",
+    "screen_top_m_bls": "float64",
+    "screen_bottom_m_bls": "float64",
+    "hsu_raw": "str",
+    "fuente_z_raw": "str",
+    "nota": "str"
+  },
+  "null_count": {
+    "tabla": 0,
+    "pag_impresa": 0,
+    "pag_pdf": 0,
+    "pozo_id": 0,
+    "well_id": 0,
+    "x_raw": 0,
+    "y_raw": 0,
+    "easting_m": 0,
+    "northing_m": 0,
+    "land_surface_elev_masl": 1,
+    "land_surface_elev_raw": 0,
+    "year_constructed": 0,
+    "total_depth_m": 0,
+    "screen_top_m_bls": 0,
+    "screen_bottom_m_bls": 0,
+    "hsu_raw": 0,
+    "fuente_z_raw": 0,
+    "nota": 7
+  },
+  "n_distinct": {
+    "tabla": 1,
+    "pag_impresa": 2,
+    "pag_pdf": 2,
+    "pozo_id": 12,
+    "well_id": 12,
+    "x_raw": 12,
+    "y_raw": 12,
+    "easting_m": 12,
+    "northing_m": 12,
+    "land_surface_elev_masl": 11,
+    "land_surface_elev_raw": 12,
+    "year_constructed": 4,
+    "total_depth_m": 12,
+    "screen_top_m_bls": 11,
+    "screen_bottom_m_bls": 12,
+    "hsu_raw": 12,
+    "fuente_z_raw": 2,
+    "nota": 3
+  },
+  "min_max": {
+    "pag_impresa": {
+      "min": 426,
+      "max": 427
+    },
+    "pag_pdf": {
+      "min": 442,
+      "max": 443
+    },
+    "easting_m": {
+      "min": 3419220.0,
+      "max": 3427261.0
+    },
+    "northing_m": {
+      "min": 7377555.48,
+      "max": 7392988.0
+    },
+    "land_surface_elev_masl": {
+      "min": 3936.49,
+      "max": 3962.3
+    },
+    "year_constructed": {
+      "min": 2010,
+      "max": 2019
+    },
+    "total_depth_m": {
+      "min": 51.0,
+      "max": 484.0
+    },
+    "screen_top_m_bls": {
+      "min": 18.0,
+      "max": 114.0
+    },
+    "screen_bottom_m_bls": {
+      "min": 44.0,
+      "max": 476.0
+    }
+  },
+  "file_size_bytes": 24904,
+  "file_index_columns": [],
+  "file_uniques": [
+    "pozo_id",
+    "well_id",
+    "x_raw",
+    "y_raw",
+    "easting_m",
+    "northing_m",
+    "land_surface_elev_masl",
+    "land_surface_elev_raw",
+    "total_depth_m",
+    "screen_bottom_m_bls",
+    "hsu_raw"
+  ],
+  "uniques_verified": true,
+  "not_nulls_verified": true,
+  "index_columns_verified": true,
+  "fk_orphans": [
+    {
+      "source_col": "pozo_id",
+      "target_table": "wells",
+      "target_col": "pozo_id",
+      "orphans": []
+    }
+  ],
+  "fk_verified": true
+}

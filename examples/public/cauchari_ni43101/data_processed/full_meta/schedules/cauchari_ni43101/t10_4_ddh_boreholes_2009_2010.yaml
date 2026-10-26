@@ -1,0 +1,45 @@
+schema_version: null
+keys:
+  uniques:
+  - well_id
+  not_nulls:
+  - well_id
+  foreign_keys:
+  - source_col: well_id
+    target_table: wells
+    target_col: pozo_id
+semantics:
+  description: 'Diamond drill holes (DDH) of the 2009-2010 program with drilled interval
+    and length. Source: NI 43-101 technical report on the Cauchari-Olaroz operation
+    (effective Jan 8 2025), Table 10.4 (printed p.151, PDF p.167).'
+  grain: one row per DDH hole
+  caveats: well_id was normalized to two digits (DDH-1 -> DDH-01) to match Tables
+    10.5 and 15.3; the id as printed is kept in well_id_raw. The source writes 'DDH9A'
+    without a hyphen. from_m is empty where the source prints '-'. Twins (suffix A-D)
+    are separate holes of the same site. No coordinates here.
+  temporal_scope: campaign_window
+  cross_tables:
+  - t10_5_ddh_brine_chemistry
+  - wells
+  column_info:
+    tabla: report table number the row was extracted from
+    pag_impresa: printed page of the report where the row is
+    pag_pdf: PDF page of the row (printed page + 16)
+    nota: free-text flag written at extraction (source typo, outlier, reconstructed
+      row, cross-check result); empty = nothing to flag
+    well_id: canonical DDH id (DDH-nn[A]); joins `wells.pozo_id`
+    well_id_raw: id exactly as printed in this table
+    from_m: start of drilled interval in m; empty = '-' in source
+    to_m: end of drilled interval in m
+    length_m: metres drilled as printed
+inspect: null
+file_columns:
+- tabla
+- pag_impresa
+- pag_pdf
+- well_id
+- from_m
+- to_m
+- length_m
+- nota
+- well_id_raw

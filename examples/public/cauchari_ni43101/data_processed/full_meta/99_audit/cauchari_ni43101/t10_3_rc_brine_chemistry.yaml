@@ -1,0 +1,43 @@
+repo: parquet-meta-contract/examples/public/cauchari_ni43101
+source_path: t10_3_rc_brine_chemistry.yaml
+source_sha256: 71e69896a37787c83b8227a8afde84371272a8a4b67f6d9b1e92845c3b3f9007
+git_commit: null
+written_at: '2026-10-26 12:00:18.116108'
+source_yaml: "meta:\n  keys:\n    uniques:\n    - well_id\n    - from_m\n    - to_m\n\
+  \    not_nulls:\n    - well_id\n    - from_m\n    - to_m\n    foreign_keys:\n  \
+  \  - source_col: well_id\n      target_table: t10_1_rc_boreholes\n      target_col:\
+  \ well_id\n    - source_col: well_id\n      target_table: wells\n      target_col:\
+  \ pozo_id\n  semantics:\n    description: >-\n      Brine chemistry averaged over\
+  \ depth intervals of the RC boreholes PE-04..PE-22 (B, K, Li, Mg, SO4\n      and\
+  \ ratios). Source: NI 43-101 technical report on the Cauchari-Olaroz operation (effective\
+  \ Jan\n      8 2025), Table 10.3 (printed p.149-150, PDF p.165-166).\n    grain:\
+  \ one row per RC borehole and depth interval - an interval average, not an individual\
+  \ sample\n    caveats: >-\n      Values are averages over the interval, not point\
+  \ samples. mg_li_orig is Mg/Li rounded to an integer\n      as printed; use mg_li_recalc\
+  \ (mg_mg_l / li_mg_l, 2 decimals) for any calculation. Convention in\n      source:\
+  \ comma = thousands in concentrations, point = decimal in ratios. length_m is smaller\
+  \ than\n      to_m - from_m in some rows exactly as printed (unsampled metres, lost\
+  \ circulation while drilling);\n      do not 'fix' it. Outliers are kept as printed\
+  \ and flagged in `nota` and in inspect. Every row is\n      already an average over\
+  \ an interval of very different length: weight by interval length when averaging,\n\
+  \      and do not pool Tables 10.3, 10.5 and 10.7 without considering campaign,\
+  \ sampling method and laboratory.\n    temporal_scope: campaign_window\n    cross_tables:\n\
+  \    - t10_1_rc_boreholes\n    - wells\n    column_info:\n      tabla: report table\
+  \ number the row was extracted from\n      pag_impresa: printed page of the report\
+  \ where the row is\n      pag_pdf: PDF page of the row (printed page + 16)\n   \
+  \   nota: >-\n        free-text flag written at extraction (source typo, outlier,\
+  \ reconstructed row, cross-check result);\n        empty = nothing to flag\n   \
+  \   well_id: RC borehole id; joins `t10_1_rc_boreholes` and `wells.pozo_id`\n  \
+  \    from_m: interval top, m (depth reference not stated in the source)\n      to_m:\
+  \ interval bottom, m (same reference as from_m)\n      length_m: interval length\
+  \ as printed (may be < to_m - from_m)\n      b_mg_l: boron, mg/L\n      k_mg_l:\
+  \ potassium, mg/L\n      li_mg_l: lithium, mg/L\n      mg_mg_l: magnesium, mg/L\n\
+  \      so4_mg_l: sulfate, mg/L\n      mg_li_orig: Mg/Li as printed, rounded to integer\n\
+  \      k_li: K/Li ratio as printed\n      so4_li: SO4/Li ratio as printed (recomputing\
+  \ from the concentrations differs by up to ~0.1%)\n      mg_li_recalc: Mg/Li computed\
+  \ from mg_mg_l / li_mg_l (not in the source)\n"
+username: null
+quality: silver
+notes: Tables extracted from a public NI 43-101 technical report (Cauchari-Olaroz,
+  effective Jan 8 2025); see DATASET.md
+writer_version: 1

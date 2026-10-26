@@ -1,0 +1,6 @@
+tabla,pag_pdf,texto_crudo_de_la_fila,motivo
+15.3,283,"CAU02D 3424385 7376814 3938.65 3939.85 -1.20 | CAU03D ... | CAU06R ... | CAU12D ... ; source cells ""Adv. Lithium, 2018"" x4 printed below/offset from the rows","Source column of the 4 CAU rows is vertically offset in the PDF; assigned 1:1 in order (4 cells, 4 rows). Low risk, but it is a reconstruction"
+15.3,283,DDH-17 3418305 7343262 3960.71 3959.42 1.29* Exar,"Y=7343262 is 20 km south of the next well; observed level 3960.71 vs ~3937 elsewhere; footnote ""*"" flowing well. Kept as printed (checked on page image)"
+A1_T1,442,W04-A 3422492 7379474 3937.97 2019 478 73 472 Halite with Sand Interbedded Sand and Halite Halite with Sand Lower Sand Basal Sand,"HSU cell with 5 repeated HSUs, justified text: cannot be split reliably into separate units. Kept verbatim in hsu_raw"
+A1_T1,442,W11-06 / W18-23 HSU multi-line cells,Same: several HSUs run together in one cell. Kept verbatim in hsu_raw
+A2_T4,446,PB-6A 3419220 7377554 3941.44 vs Appendix 1 PB-06A 3419220.00 7377555.48,"Northing differs 1.48 m between appendices (others < 1 m, truncation). Both kept as printed"
